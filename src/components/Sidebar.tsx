@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 
 interface SidebarProps {
   subreddits: string[];
@@ -6,31 +6,69 @@ interface SidebarProps {
   onSubredditSelect: (subreddit: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
+const Sidebar = ({
   subreddits,
   selectedSubreddit,
   onSubredditSelect,
-}) => {
+}: SidebarProps) => {
+  const [inputSubreddit, setInputSubreddit] = useState("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputSubreddit(e.target.value);
+  };
+
+  const handleFetchClick = () => {
+    if (inputSubreddit.trim()) {
+      onSubredditSelect(inputSubreddit.trim());
+      setInputSubreddit("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleFetchClick();
+    }
+  };
+
   return (
-    <aside className="w-64 shrink-0 bg-gray-800 p-4 h-screen sticky top-0">
-      <h2 className="text-xl font-bold text-white mb-4">Subreddits</h2>
-      <ul className="space-y-2">
+    <aside className="w-64 bg-gray-800 p-4">
+      <div className="mb-6">
+        <input
+          type="text"
+          value={inputSubreddit}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          className="w-full px-4 py-2 border rounded-lg mb-2"
+          placeholder="Enter subreddit name"
+          aria-label="Subreddit name"
+        />
+        <button
+          onClick={handleFetchClick}
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
+          aria-label="Fetch posts"
+        >
+          Fetch Posts
+        </button>
+      </div>
+
+      <h2 className="text-lg font-semibold mb-4">Your Subreddits</h2>
+      <div className="space-y-2">
         {subreddits.map((subreddit) => (
-          <li key={subreddit}>
-            <button
-              className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                selectedSubreddit === subreddit
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-300 hover:bg-gray-700"
-              }`}
-              onClick={() => onSubredditSelect(subreddit)}
-              aria-label={`Select ${subreddit} subreddit`}
-            >
-              {subreddit}
-            </button>
-          </li>
+          <button
+            key={subreddit}
+            onClick={() => onSubredditSelect(subreddit)}
+            className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
+              selectedSubreddit === subreddit
+                ? "bg-blue-500 text-white"
+                : "bg-white text-gray-800 hover:bg-gray-200"
+            }`}
+            aria-label={`Select ${subreddit} subreddit`}
+            aria-pressed={selectedSubreddit === subreddit}
+          >
+            r/{subreddit}
+          </button>
         ))}
-      </ul>
+      </div>
     </aside>
   );
 };

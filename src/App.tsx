@@ -78,18 +78,13 @@ const App = () => {
     setSubreddit(selectedSubreddit);
   };
 
-  const handleFetchPostsClick = (inputSubreddit: string) => {
-    setSubreddit(inputSubreddit);
-    handleFetchPosts();
-  };
-
   useEffect(() => {
     handleFetchPosts();
   }, [handleFetchPosts]);
 
   const MainContent = () => {
     return (
-      <div className="w-full p-8 ">
+      <div className="w-full p-8 overflow-y-auto h-screen">
         {loading ? (
           <LoadingSpinner />
         ) : error ? (
@@ -97,23 +92,20 @@ const App = () => {
         ) : (
           <>
             <div className="flex space-x-2 mb-4">
-              <div className="flex space-x-2 mb-4">
-                {posts.map((post, index) => (
-                  <button
-                    key={post.permalink}
-                    onClick={() => setSelectedPostIndex(index)}
-                    className={`px-4 py-2 rounded-lg ${
-                      selectedPostIndex === index
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-black"
-                    }`}
-                    aria-label={`Select post "${post.title}"`}
-                  >
-                    {post.title}
-                  </button>
-                ))}
-              </div>
-              <SubredditInput onFetch={handleFetchPostsClick} />
+              {posts.map((post, index) => (
+                <button
+                  key={post.permalink}
+                  onClick={() => setSelectedPostIndex(index)}
+                  className={`px-4 py-2 rounded-lg text-xs ${
+                    selectedPostIndex === index
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
+                  aria-label={`Select post "${post.title}"`}
+                >
+                  {post.title}
+                </button>
+              ))}
             </div>
 
             <>
@@ -174,39 +166,3 @@ const App = () => {
 };
 
 export default App;
-
-const SubredditInput = ({
-  onFetch,
-}: {
-  onFetch: (subreddit: string) => void;
-}) => {
-  const [inputSubreddit, setInputSubreddit] = useState("");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputSubreddit(e.target.value);
-  };
-
-  const handleFetchClick = () => {
-    onFetch(inputSubreddit);
-  };
-
-  return (
-    <div className="mb-6">
-      <input
-        type="text"
-        value={inputSubreddit}
-        onChange={handleInputChange}
-        className="px-4 py-2 border rounded-lg mr-2"
-        placeholder="Enter subreddit name"
-        aria-label="Subreddit name"
-      />
-      <button
-        onClick={handleFetchClick}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
-        aria-label="Fetch posts"
-      >
-        Fetch Posts
-      </button>
-    </div>
-  );
-};
