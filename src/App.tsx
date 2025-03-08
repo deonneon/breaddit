@@ -162,17 +162,18 @@ const App = () => {
           </button>
         </div>
         
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
           {posts.map((post, index) => (
             <button
               key={post.permalink}
               onClick={() => setSelectedPostIndex(index)}
-              className={`px-3 md:px-4 py-1 md:py-2 rounded-lg text-xs max-w-[150px] md:max-w-[200px] text-left whitespace-normal ${
+              className={`px-3 md:px-4 py-1 h-16 md:py-2 rounded-lg text-xs w-full text-left overflow-hidden ${
                 selectedPostIndex === index
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
               }`}
               aria-label={`Select post "${post.title}"`}
+              title={post.title}
             >
               {post.title}
             </button>
@@ -200,12 +201,12 @@ const App = () => {
 
             {/* Display the submission body if it exists */}
             {posts[selectedPostIndex].selftext && (
-              <div className="mt-4 mb-6 ml-1 text-gray-800 dark:text-gray-200 break-words">
+              <div className="mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words">
                 {renderMarkdown(posts[selectedPostIndex].selftext.trimStart())}
               </div>
             )}
 
-            <div className="mt-4 md:mt-6 space-y-4">
+            <div className="mt-2 md:mt-3 space-y-3">
               {posts[selectedPostIndex].comments.length > 0 ? (
                 posts[selectedPostIndex].comments.map((comment) => (
                   <Comment

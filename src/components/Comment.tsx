@@ -42,7 +42,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
     return `ml-${Math.min(depth * 2, 6)} md:ml-${Math.min(depth * 4, 16)}`;
   };
   
-  const borderClass = depth > 0 ? "border-l-2 border-gray-300 dark:border-gray-700" : "";
+  const borderClass = depth > 0 ? "border-l-1 border-gray-300 dark:border-gray-700 border-dotted" : "";
 
   return (
     <div className="mb-3 md:mb-4">
