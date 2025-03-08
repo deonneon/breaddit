@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface SidebarProps {
   subreddits: string[];
@@ -12,6 +12,22 @@ const Sidebar = ({
   onSubredditSelect,
 }: SidebarProps) => {
   const [inputSubreddit, setInputSubreddit] = useState("");
+  const [mySubreddits, setMySubreddits] = useState<string[]>([]);
+
+  // Load saved subreddits from localStorage on component mount
+  useEffect(() => {
+    const savedSubreddits = localStorage.getItem("mySubreddits");
+    if (savedSubreddits) {
+      setMySubreddits(JSON.parse(savedSubreddits));
+    }
+  }, []);
+
+  // Save mySubreddits to localStorage whenever it changes
+  useEffect(() => {
+    if (mySubreddits.length > 0) {
+      localStorage.setItem("mySubreddits", JSON.stringify(mySubreddits));
+    }
+  }, [mySubreddits]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputSubreddit(e.target.value);
@@ -19,7 +35,14 @@ const Sidebar = ({
 
   const handleFetchClick = () => {
     if (inputSubreddit.trim()) {
-      onSubredditSelect(inputSubreddit.trim());
+      const newSubreddit = inputSubreddit.trim();
+      onSubredditSelect(newSubreddit);
+      
+      // Add to mySubreddits if not already in the list
+      if (!mySubreddits.includes(newSubreddit) && !subreddits.includes(newSubreddit)) {
+        setMySubreddits(prev => [...prev, newSubreddit]);
+      }
+      
       setInputSubreddit("");
     }
   };
@@ -48,15 +71,15 @@ const Sidebar = ({
         />
         <button
           onClick={handleFetchClick}
-          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
+          className="w-full px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-600 focus:ring-2 focus:ring-blue-300"
           aria-label="Fetch posts"
         >
           Fetch Posts
         </button>
       </div>
 
-      <h2 className="text-lg font-semibold mb-4">Your Subreddits</h2>
-      <div className="space-y-2">
+      <h2 className="text-lg font-semibold mb-4">Default Subreddits</h2>
+      <div className="space-y-2 mb-6">
         {subreddits.map((subreddit) => (
           <button
             key={subreddit}
@@ -73,6 +96,29 @@ const Sidebar = ({
           </button>
         ))}
       </div>
+
+      {mySubreddits.length > 0 && (
+        <>
+          <h2 className="text-lg font-semibold mb-4">My Subreddits</h2>
+          <div className="space-y-2">
+            {mySubreddits.map((subreddit) => (
+              <button
+                key={subreddit}
+                onClick={() => onSubredditSelect(subreddit)}
+                className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
+                  selectedSubreddit === subreddit
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
+                }`}
+                aria-label={`Select ${subreddit} subreddit`}
+                aria-pressed={selectedSubreddit === subreddit}
+              >
+                r/{subreddit}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </aside>
   );
 };

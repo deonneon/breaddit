@@ -63,7 +63,7 @@ async function fetchComments(comment: snoowrap.Comment): Promise<Comment> {
 async function fetchSubredditData(subredditName: string) {
   const subreddit = reddit.getSubreddit(subredditName);
   // Fetch the 2 hottest posts
-  const submissions = await subreddit.getHot({ limit: 2 });
+  const submissions = await subreddit.getHot({ limit: 4 });
 
   const postsData = await Promise.all(
     submissions.map(async (submission) => {

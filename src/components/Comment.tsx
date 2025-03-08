@@ -1,5 +1,4 @@
 import { RedditComment } from "../services/redditService";
-import React from "react";
 
 type CommentProps = {
   comment: RedditComment;
