@@ -1,8 +1,6 @@
 import { RedditComment } from "../services/redditService";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ReactNode } from 'react';
-import type { Components } from 'react-markdown';
 
 type CommentProps = {
   comment: RedditComment;
