@@ -42,21 +42,41 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
     return `ml-${Math.min(depth * 2, 6)} md:ml-${Math.min(depth * 4, 16)}`;
   };
   
-  const borderClass = depth > 0 ? "border-l-1 border-gray-300 dark:border-gray-700 border-dotted" : "";
+  // Different border colors for different nesting levels
+  const getBorderColor = () => {
+    if (depth === 0) return "";
+    
+    const colors = [
+      "border-orange-300 dark:border-orange-700",
+      "border-blue-300 dark:border-blue-700",
+      "border-green-300 dark:border-green-700",
+      "border-purple-300 dark:border-purple-700",
+      "border-pink-300 dark:border-pink-700",
+    ];
+    
+    return colors[(depth - 1) % colors.length];
+  };
+  
+  const borderClass = depth > 0 
+    ? `border-l-2 ${getBorderColor()} pl-2 md:pl-4` 
+    : "";
 
   return (
-    <div className="mb-3 md:mb-4">
-      <div className={`pl-2 md:pl-4 ${getIndentClass()} ${borderClass}`}>
-        <div className="text-xs md:text-sm text-gray-700 dark:text-gray-400 mb-1 flex items-center">
-          {depth === 0 && <span className="inline-block w-2 h-1 bg-gray-500 dark:bg-gray-400 mr-2"></span>}
-          <span className="font-normal">{comment.author}</span><span className="font-light ml-2 text-xs">{formatDate(timestamp)}</span>
+    <div className="mb-4 md:mb-5 group">
+      <div className={`${getIndentClass()} ${borderClass} transition-all duration-200`}>
+        <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
+          {depth === 0 ? (
+            <span className="inline-block w-2 h-2 bg-orange-500 rounded-half mr-2 flex-shrink-0"></span>
+          ) : ""}
+          <span className="font-medium">{comment.author}</span>
+          <span className="font-light ml-2 text-xs opacity-80">{formatDate(timestamp)}</span>
         </div>
-        <div className={`text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full ${depth === 0 ? "ml-2 md:ml-4" : ""} `}>
+        <div className={`text-gray-900 dark:text-gray-200 mb-3 break-words overflow-hidden max-w-full prose dark:prose-invert prose-sm md:prose-base prose-orange ${depth === 0 ? "ml-6" : "ml-4"}`}>
           {renderMarkdown(comment.body)}
         </div>
         {/* Render nested replies if they exist */}
         {comment.replies && comment.replies.length > 0 && (
-          <div className="mt-1 md:mt-2">
+          <div className="mt-2 md:mt-3">
             {comment.replies.map((reply) => (
               <Comment
                 key={reply.id}
