@@ -22,10 +22,18 @@ const API_BASE_URL = import.meta.env.DEV
   : "/api"; // In production, use relative path
 
 const fetchSubredditPosts = async (
-  subreddit: string
+  subreddit: string,
+  limit?: number
 ): Promise<RedditPost[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${subreddit}`, {
+    const url = new URL(`${API_BASE_URL}/posts/${subreddit}`);
+    
+    // Add limit parameter if provided
+    if (limit) {
+      url.searchParams.append('limit', limit.toString());
+    }
+    
+    const response = await fetch(url.toString(), {
       headers: {
         "Content-Type": "application/json",
       },

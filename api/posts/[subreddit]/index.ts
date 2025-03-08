@@ -47,10 +47,10 @@ async function fetchComments(comment: snoowrap.Comment): Promise<Comment> {
 /**
  * Fetch posts and their comments from a given subreddit.
  */
-async function fetchSubredditData(subredditName: string) {
+async function fetchSubredditData(subredditName: string, limit: number = 4) {
   const subreddit = reddit.getSubreddit(subredditName);
-  // Fetch the 4 hottest posts
-  const submissions = await subreddit.getHot({ limit: 4 });
+  // Fetch the hottest posts with the specified limit
+  const submissions = await subreddit.getHot({ limit });
 
   const postsData = await Promise.all(
     submissions.map(async (submission) => {
@@ -107,8 +107,11 @@ export default async function handler(
     return res.status(400).json({ error: 'Subreddit parameter is required' });
   }
 
+  // Parse the limit parameter if provided, otherwise use default
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+
   try {
-    const data = await fetchSubredditData(subreddit);
+    const data = await fetchSubredditData(subreddit, limit);
     return res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching subreddit data:", error);

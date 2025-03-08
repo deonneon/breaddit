@@ -36,7 +36,16 @@ const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Default subreddits that are always available
-  const defaultSubreddits = ["thewallstreet", "stocks", "singularity"];
+  const defaultSubreddits = ["thewallstreet", "stocks", "singularity", "localllama", "wallstreetbets"];
+  
+  // Default post limits for each subreddit
+  const subredditPostLimits: Record<string, number> = {
+    "thewallstreet":3,
+    "stocks": 4,
+    "singularity": 8,
+    "localllama": 8,
+    "wallstreetbets": 8
+  };
 
   const handleFetchPosts = useCallback(async () => {
     try {
@@ -53,7 +62,9 @@ const App = () => {
         return;
       }
 
-      const data = await fetchSubredditPosts(subreddit);
+      // Get the post limit for the current subreddit or use default of 4
+      const postLimit = subredditPostLimits[subreddit] || 4;
+      const data = await fetchSubredditPosts(subreddit, postLimit);
       
       // Ensure we're only using the latest data from the server
       setPosts(data);
