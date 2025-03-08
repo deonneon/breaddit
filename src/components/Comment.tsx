@@ -47,9 +47,9 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
     if (depth === 0) return "";
     
     const colors = [
-      "border-orange-300 dark:border-orange-800",
-      "border-orange-200 dark:border-orange-900",
-      "border-orange-100 dark:border-orange-950",
+      "border-orange-300 dark:border-orange-700",
+      "border-orange-200 dark:border-orange-800",
+      "border-orange-100 dark:border-orange-900",
       "border-orange-300 dark:border-orange-700",
       "border-orange-200 dark:border-orange-800",
     ];
@@ -58,7 +58,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
   };
   
   const borderClass = depth > 0 
-    ? `border-l-2 ${getBorderColor()} pl-2 md:pl-4` 
+    ? `border-l-1 ${getBorderColor()} pl-2 md:pl-4 border-dotted` 
     : "";
 
   return (
