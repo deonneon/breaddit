@@ -339,7 +339,7 @@ const App = () => {
       {/* Sidebar - hidden on mobile unless toggled */}
       <div className={`
         ${sidebarOpen ? 'block' : 'hidden'} 
-        md:block fixed md:static z-20 md:h-screen h-[calc(100vh-64px)] top-16 md:top-0 w-72
+        md:block fixed md:static z-20 md:h-screen h-[calc(100vh-64px)] top-16 md:top-0 w-64
         transition-all duration-300 ease-in-out md:flex-shrink-0 shadow-lg md:shadow-none
       `}>
         <Sidebar

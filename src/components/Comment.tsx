@@ -47,11 +47,11 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
     if (depth === 0) return "";
     
     const colors = [
+      "border-orange-300 dark:border-orange-800",
+      "border-orange-200 dark:border-orange-900",
+      "border-orange-100 dark:border-orange-950",
       "border-orange-300 dark:border-orange-700",
-      "border-blue-300 dark:border-blue-700",
-      "border-green-300 dark:border-green-700",
-      "border-purple-300 dark:border-purple-700",
-      "border-pink-300 dark:border-pink-700",
+      "border-orange-200 dark:border-orange-800",
     ];
     
     return colors[(depth - 1) % colors.length];
@@ -66,7 +66,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
       <div className={`${getIndentClass()} ${borderClass} transition-all duration-200`}>
         <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
           {depth === 0 ? (
-            <span className="inline-block w-2 h-2 bg-orange-500 rounded-half mr-2 flex-shrink-0"></span>
+            <span className="inline-block w-2 h-1 bg-gray-300 rounded-half mr-2 flex-shrink-0"></span>
           ) : ""}
           <span className="font-medium">{comment.author}</span>
           <span className="font-light ml-2 text-xs opacity-80">{formatDate(timestamp)}</span>
