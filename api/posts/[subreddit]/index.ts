@@ -70,6 +70,7 @@ async function fetchSubredditData(subredditName: string) {
         author: submission.author.name,
         created_utc: submission.created_utc,
         permalink: submission.permalink,
+        selftext: submission.selftext,
         comments,
       };
     })

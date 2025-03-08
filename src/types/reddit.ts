@@ -6,6 +6,7 @@ export interface RedditPost {
   created_utc: number;
   num_comments: number;
   subreddit: string;
+  selftext?: string;
 }
 
 export interface SubredditData {

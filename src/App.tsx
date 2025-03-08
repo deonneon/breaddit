@@ -197,6 +197,13 @@ const App = () => {
               </a>
             </div>
 
+            {/* Display the submission body if it exists */}
+            {posts[selectedPostIndex].selftext && (
+              <div className="mt-4 mb-6 text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+                {posts[selectedPostIndex].selftext}
+              </div>
+            )}
+
             <div className="mt-4 md:mt-6 space-y-4">
               {posts[selectedPostIndex].comments.length > 0 ? (
                 posts[selectedPostIndex].comments.map((comment) => (

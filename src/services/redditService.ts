@@ -11,6 +11,7 @@ type RedditPost = {
   author: string;
   created_utc: number;
   permalink: string;
+  selftext?: string;
   comments: RedditComment[];
 };
 
