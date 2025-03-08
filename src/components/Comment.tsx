@@ -49,9 +49,9 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
       <div className={`pl-2 md:pl-4 ${getIndentClass()} ${borderClass}`}>
         <div className="text-xs md:text-sm text-gray-700 dark:text-gray-400 mb-1 flex items-center">
           {depth === 0 && <span className="inline-block w-2 h-1 bg-gray-500 dark:bg-gray-400 mr-2"></span>}
-          u/{comment.author} - {formatDate(timestamp)}
+          <span className="font-normal">{comment.author}</span><span className="font-light ml-2 text-xs">{formatDate(timestamp)}</span>
         </div>
-        <div className="text-gray-900 dark:text-gray-200 mb-2 ml-2 md:ml-4 break-words overflow-hidden max-w-full">
+        <div className={`text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full ${depth === 0 ? "ml-2 md:ml-4" : ""} `}>
           {renderMarkdown(comment.body)}
         </div>
         {/* Render nested replies if they exist */}
