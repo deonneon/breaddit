@@ -199,8 +199,8 @@ const App = () => {
 
             {/* Display the submission body if it exists */}
             {posts[selectedPostIndex].selftext && (
-              <div className="mt-4 mb-6 ml-1 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                {posts[selectedPostIndex].selftext}
+              <div className="mt-4 mb-6 ml-1 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
+                {posts[selectedPostIndex].selftext.trimStart()}
               </div>
             )}
 
