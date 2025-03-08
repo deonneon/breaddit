@@ -234,16 +234,16 @@ const App = () => {
             key={posts[selectedPostIndex].permalink}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300"
           >
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1">
               {posts[selectedPostIndex].title}
-            </h2>
+            </h5>
             
-            <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">
               <div className="flex items-center mr-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span>u/{posts[selectedPostIndex].author}</span>
+                <span>{posts[selectedPostIndex].author}</span>
               </div>
               
               <div className="flex items-center mr-4">
@@ -269,12 +269,12 @@ const App = () => {
 
             {/* Display the submission body if it exists */}
             {posts[selectedPostIndex].selftext && (
-              <div className="mt-2 mb-6 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+              <div className="mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
                 {renderMarkdown(posts[selectedPostIndex].selftext.trimStart())}
               </div>
             )}
 
-            <div className="mt-6 md:mt-8 space-y-4">
+            <div className="mt-3 md:mt-4 space-y-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />

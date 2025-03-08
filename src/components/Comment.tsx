@@ -62,7 +62,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
     : "";
 
   return (
-    <div className="mb-4 md:mb-5 group">
+    <div className="mb-2 md:mb-3 group">
       <div className={`${getIndentClass()} ${borderClass} transition-all duration-200`}>
         <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
           {depth === 0 ? (
@@ -71,12 +71,12 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
           <span className="font-medium">{comment.author}</span>
           <span className="font-light ml-2 text-xs opacity-80">{formatDate(timestamp)}</span>
         </div>
-        <div className={`text-gray-900 dark:text-gray-200 mb-3 break-words overflow-hidden max-w-full prose dark:prose-invert prose-sm md:prose-base prose-orange ${depth === 0 ? "ml-6" : "ml-4"}`}>
+        <div className={`text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full prose dark:prose-invert prose-sm md:prose-base prose-orange ${depth === 0 ? "ml-4" : ""}`}>
           {renderMarkdown(comment.body)}
         </div>
         {/* Render nested replies if they exist */}
         {comment.replies && comment.replies.length > 0 && (
-          <div className="mt-2 md:mt-3">
+          <div className="mt-1 md:mt-2">
             {comment.replies.map((reply) => (
               <Comment
                 key={reply.id}
