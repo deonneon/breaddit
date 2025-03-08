@@ -54,9 +54,9 @@ const Sidebar = ({
   };
 
   return (
-    <aside className="w-64 p-4 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white">
+    <aside className="w-full h-full p-4 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white overflow-y-auto flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">Breaddit</h1>
+        <h1 className="text-xl font-bold hidden md:block">Breaddit</h1>
       </div>
       
       <div className="mb-6">
@@ -78,47 +78,49 @@ const Sidebar = ({
         </button>
       </div>
 
-      <h2 className="text-lg font-semibold mb-4">Default Subreddits</h2>
-      <div className="space-y-2 mb-6">
-        {subreddits.map((subreddit) => (
-          <button
-            key={subreddit}
-            onClick={() => onSubredditSelect(subreddit)}
-            className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
-              selectedSubreddit === subreddit
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
-            }`}
-            aria-label={`Select ${subreddit} subreddit`}
-            aria-pressed={selectedSubreddit === subreddit}
-          >
-            r/{subreddit}
-          </button>
-        ))}
-      </div>
+      <div className="flex-1 overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-4">Default Subreddits</h2>
+        <div className="space-y-2 mb-6">
+          {subreddits.map((subreddit) => (
+            <button
+              key={subreddit}
+              onClick={() => onSubredditSelect(subreddit)}
+              className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
+                selectedSubreddit === subreddit
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
+              }`}
+              aria-label={`Select ${subreddit} subreddit`}
+              aria-pressed={selectedSubreddit === subreddit}
+            >
+              r/{subreddit}
+            </button>
+          ))}
+        </div>
 
-      {mySubreddits.length > 0 && (
-        <>
-          <h2 className="text-lg font-semibold mb-4">My Subreddits</h2>
-          <div className="space-y-2">
-            {mySubreddits.map((subreddit) => (
-              <button
-                key={subreddit}
-                onClick={() => onSubredditSelect(subreddit)}
-                className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
-                  selectedSubreddit === subreddit
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
-                }`}
-                aria-label={`Select ${subreddit} subreddit`}
-                aria-pressed={selectedSubreddit === subreddit}
-              >
-                r/{subreddit}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+        {mySubreddits.length > 0 && (
+          <>
+            <h2 className="text-lg font-semibold mb-4">My Subreddits</h2>
+            <div className="space-y-2 pb-4">
+              {mySubreddits.map((subreddit) => (
+                <button
+                  key={subreddit}
+                  onClick={() => onSubredditSelect(subreddit)}
+                  className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
+                    selectedSubreddit === subreddit
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
+                  }`}
+                  aria-label={`Select ${subreddit} subreddit`}
+                  aria-pressed={selectedSubreddit === subreddit}
+                >
+                  r/{subreddit}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </aside>
   );
 };
