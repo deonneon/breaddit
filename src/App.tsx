@@ -35,7 +35,7 @@ const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Default subreddits that are always available
-  const defaultSubreddits = ["thewallstreet", "stocks"];
+  const defaultSubreddits = ["thewallstreet", "stocks", "singularity"];
 
   const handleFetchPosts = useCallback(async () => {
     try {
@@ -152,7 +152,7 @@ const App = () => {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">r/{subreddit}</h1>
           <button
             onClick={refreshPosts}
-            className="p-2 text-black rounded-full hover:bg-blue-600 transition-transform hover:rotate-180 duration-500"
+            className="p-2 text-gray-700 dark:text-gray-300 rounded-full hover:bg-blue-600 transition-transform hover:rotate-180 duration-500"
             aria-label="Refresh posts"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -265,7 +265,7 @@ const App = () => {
       {/* Overlay to close sidebar when clicking outside on mobile */}
       {sidebarOpen && (
         <div 
-          className="md:hidden fixed inset-0 top-16 z-10"
+          className="md:hidden fixed inset-0 top-16 z-10 bg-gray-100 dark:bg-gray-800 opacity-70"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
