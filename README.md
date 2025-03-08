@@ -1,50 +1,58 @@
-# React + TypeScript + Vite
+# Breaddit - Your Personal Reddit Stream
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Breaddit is a modern, personalized Reddit stream application built with React, TypeScript, and Vite. It allows you to browse and follow your favorite subreddits in a clean, distraction-free interface.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Browse posts from your favorite subreddits
+- View comments and discussions in a clean, threaded interface
+- Cache recent posts for faster loading
+- Responsive design that works on desktop and mobile
+- Dark mode support
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Frontend**: React 19, TypeScript, Tailwind CSS
+- **Backend**: Vercel Serverless Functions
+- **API Integration**: Reddit API via Snoowrap
+- **Build Tools**: Vite, ESLint, TypeScript
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Prerequisites
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- Node.js (v18 or higher)
+- npm or yarn
+- Reddit API credentials
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Installation
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. Clone the repository
+   ```
+   git clone https://github.com/yourusername/breaddit.git
+   cd breaddit
+   ```
+
+2. Install dependencies
+   ```
+   npm install
+   ```
+
+3. Create a `.env` file in the root directory with your Reddit API credentials (see `.env.example` for reference)
+
+4. Start the development server
+   ```
+   npm run dev
+   ```
+
+## Deployment
+
+This project is configured for easy deployment on Vercel. See `VERCEL_DEPLOYMENT.md` for detailed instructions.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -14,7 +14,11 @@ type RedditPost = {
   comments: RedditComment[];
 };
 
-const API_BASE_URL = "http://localhost:3001/api";
+// For same-domain deployment, we can use a relative URL
+// In development, we'll use the full URL from the environment variable
+const API_BASE_URL = import.meta.env.DEV 
+  ? (import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api")
+  : "/api"; // In production, use relative path
 
 const fetchSubredditPosts = async (
   subreddit: string
