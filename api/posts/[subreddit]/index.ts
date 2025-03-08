@@ -1,7 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import snoowrap from 'snoowrap';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
+
+// Configure dotenv for ES modules
 dotenv.config();
 
 // Initialize Reddit API client
