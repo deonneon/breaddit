@@ -26,7 +26,13 @@ const fetchSubredditPosts = async (
   limit?: number
 ): Promise<RedditPost[]> => {
   try {
-    const url = new URL(`${API_BASE_URL}/posts/${subreddit}`);
+    // Fix URL construction to work with both absolute and relative paths
+    let urlString = `${API_BASE_URL}/posts/${subreddit}`;
+    
+    // If it's a relative URL (starts with /), prepend the current origin
+    const url = urlString.startsWith('/') 
+      ? new URL(urlString, window.location.origin)
+      : new URL(urlString);
     
     // Add limit parameter if provided
     if (limit) {
