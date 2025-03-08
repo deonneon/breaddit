@@ -5,6 +5,7 @@ import type { RedditPost } from "./services/redditService";
 import Sidebar from "./components/Sidebar";
 import Comment from "./components/Comment";
 import LoadingSpinner from "./components/LoadingSpinner";
+import { renderMarkdown } from "./utils/markdownUtils";
 
 const formatDate = (timestamp: number): string => {
   return new Date(timestamp * 1000).toLocaleDateString("en-US", {
@@ -199,8 +200,8 @@ const App = () => {
 
             {/* Display the submission body if it exists */}
             {posts[selectedPostIndex].selftext && (
-              <div className="mt-4 mb-6 ml-1 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
-                {posts[selectedPostIndex].selftext.trimStart()}
+              <div className="mt-4 mb-6 ml-1 text-gray-800 dark:text-gray-200 break-words">
+                {renderMarkdown(posts[selectedPostIndex].selftext.trimStart())}
               </div>
             )}
 
