@@ -1,4 +1,8 @@
 import { RedditComment } from "../services/redditService";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { ReactNode } from 'react';
+import type { Components } from 'react-markdown';
 
 type CommentProps = {
   comment: RedditComment;
@@ -15,63 +19,59 @@ const formatDate = (timestamp: number): string => {
   });
 };
 
-// Function to format comment text with proper line breaks and URL handling
-const formatCommentText = (text: string) => {
-  // Split the text by new lines
-  const paragraphs = text.split("\n").filter(p => p.trim() !== "");
-  
-  // URL regex pattern
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  
-  return paragraphs.map((paragraph, index) => {
-    // Check if the paragraph contains only a URL
-    const urlMatches = paragraph.match(urlRegex);
-    const isOnlyUrl = urlMatches && urlMatches.length === 1 && urlMatches[0] === paragraph.trim();
-    
-    if (isOnlyUrl) {
-      // For paragraphs that are just a URL, render as a clickable link
-      return (
-        <p key={index} className="mb-2">
+// Function to render markdown with custom components
+const renderMarkdown = (text: string) => {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        a: ({ node, href, children, ...props }) => (
           <a 
-            href={urlMatches[0]} 
+            href={href} 
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-blue-600 hover:underline break-all text-xs md:text-base"
+            {...props}
           >
-            {urlMatches[0]}
+            {children}
           </a>
-        </p>
-      );
-    } else {
-      // For mixed content paragraphs, replace URLs with clickable links
-      const parts = paragraph.split(urlRegex);
-      const elements = [];
-      
-      for (let i = 0; i < parts.length; i++) {
-        if (i % 2 === 0) {
-          // Text part
-          if (parts[i]) {
-            elements.push(parts[i]);
-          }
-        } else {
-          // URL part
-          elements.push(
-            <a 
-              key={`link-${i}`} 
-              href={parts[i]} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-blue-600 hover:underline break-all text-xs md:text-base"
-            >
-              {parts[i]}
-            </a>
+        ),
+        p: ({ children }) => <p className="mb-2 text-xs md:text-base">{children}</p>,
+        h1: ({ children }) => <h1 className="text-xl font-bold mb-2">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-lg font-bold mb-2">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-base font-bold mb-2">{children}</h3>,
+        ul: ({ children }) => <ul className="list-disc ml-5 mb-2">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal ml-5 mb-2">{children}</ol>,
+        li: ({ children }) => <li className="mb-1 text-xs md:text-base">{children}</li>,
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-4 border-gray-300 pl-2 italic text-gray-700 dark:text-gray-400 mb-2">
+            {children}
+          </blockquote>
+        ),
+        // Simplified code component to avoid type issues
+        code: (props) => {
+          const { children, className } = props;
+          // Check if this is an inline code block
+          const match = /language-(\w+)/.exec(className || '');
+          const isInline = !match;
+          
+          return isInline ? (
+            <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded text-xs md:text-sm">
+              {children}
+            </code>
+          ) : (
+            <pre className="bg-gray-200 dark:bg-gray-800 p-2 rounded overflow-x-auto mb-2">
+              <code className={`text-xs md:text-sm ${className}`}>
+                {children}
+              </code>
+            </pre>
           );
-        }
-      }
-      
-      return <p key={index} className="mb-2 text-xs md:text-base">{elements}</p>;
-    }
-  });
+        },
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  );
 };
 
 const Comment = ({ comment, depth, timestamp }: CommentProps) => {
@@ -91,8 +91,8 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
           {depth === 0 && <span className="inline-block w-2 h-1 bg-gray-500 dark:bg-gray-400 mr-2"></span>}
           u/{comment.author} - {formatDate(timestamp)}
         </div>
-        <div className="text-gray-900 dark:text-gray-200 mb-2 ml-2 md:ml-4 break-words overflow-hidden max-w-full text-xs md:text-base">
-          {formatCommentText(comment.body)}
+        <div className="text-gray-900 dark:text-gray-200 mb-2 ml-2 md:ml-4 break-words overflow-hidden max-w-full">
+          {renderMarkdown(comment.body)}
         </div>
         {/* Render nested replies if they exist */}
         {comment.replies && comment.replies.length > 0 && (
