@@ -31,14 +31,18 @@ const Sidebar = ({
   };
 
   return (
-    <aside className="w-64 bg-gray-800 p-4">
+    <aside className="w-64 p-4 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-xl font-bold">Breaddit</h1>
+      </div>
+      
       <div className="mb-6">
         <input
           type="text"
           value={inputSubreddit}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          className="w-full px-4 py-2 border rounded-lg mb-2"
+          className="w-full px-4 py-2 border rounded-lg mb-2 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white"
           placeholder="Enter subreddit name"
           aria-label="Subreddit name"
         />
@@ -60,7 +64,7 @@ const Sidebar = ({
             className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
               selectedSubreddit === subreddit
                 ? "bg-blue-500 text-white"
-                : "bg-white text-gray-800 hover:bg-gray-200"
+                : "bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
             }`}
             aria-label={`Select ${subreddit} subreddit`}
             aria-pressed={selectedSubreddit === subreddit}
