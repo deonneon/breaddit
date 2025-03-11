@@ -88,15 +88,21 @@ const App = () => {
       const postLimit = subredditPostLimits[subreddit] || 4;
       const data = await fetchSubredditPosts(subreddit, postLimit);
       
+      // Mark posts as newly fetched
+      const markedData = data.map(post => ({
+        ...post,
+        isNewlyFetched: true
+      }));
+      
       // Ensure we're only using the latest data from the server
-      setPosts(data);
+      setPosts(markedData);
       setSelectedPostIndex(0); // Reset selected post when changing subreddit
 
       // Update cache with only the latest data from the server
       setCachedPosts((prev) => ({
         ...prev,
         [subreddit]: {
-          posts: data,
+          posts: markedData,
           timestamp: now,
         },
       }));
@@ -119,13 +125,20 @@ const App = () => {
       setError(null);
 
       const data = await fetchSubredditPosts(subreddit);
-      setPosts(data);
+      
+      // Mark posts as newly fetched
+      const markedData = data.map(post => ({
+        ...post,
+        isNewlyFetched: true
+      }));
+      
+      setPosts(markedData);
       
       // Update cache with fresh data
       setCachedPosts((prev) => ({
         ...prev,
         [subreddit]: {
-          posts: data,
+          posts: markedData,
           timestamp: Date.now(),
         },
       }));
@@ -219,9 +232,11 @@ const App = () => {
               className={`px-3 md:px-4 py-2 h-auto min-h-16 rounded-lg text-sm w-full text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow ${
                 selectedPostIndex === index
                   ? "bg-orange-500 text-white shadow-md transform scale-[1.02]"
-                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  : post.isNewlyFetched 
+                    ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-2 border-green-500"
+                    : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               }`}
-              aria-label={`Select post "${post.title}"`}
+              aria-label={`Select post "${post.title}${post.isNewlyFetched ? ' (New)' : ''}"`}
               title={post.title}
             >
               <div className="line-clamp-3">{post.title}</div>
@@ -234,7 +249,15 @@ const App = () => {
             key={posts[selectedPostIndex].permalink}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300"
           >
-            <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1">
+            <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center">
+              {posts[selectedPostIndex].isNewlyFetched && (
+                <span className="inline-flex items-center px-2 py-0.5 mr-2 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                  New
+                </span>
+              )}
               {posts[selectedPostIndex].title}
             </h5>
             

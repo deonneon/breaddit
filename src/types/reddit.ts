@@ -7,6 +7,7 @@ export interface RedditPost {
   num_comments: number;
   subreddit: string;
   selftext?: string;
+  isNewlyFetched?: boolean; // Flag to indicate if the post was newly fetched or loaded from cache
 }
 
 export interface SubredditData {

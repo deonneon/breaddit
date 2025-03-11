@@ -13,6 +13,7 @@ type RedditPost = {
   permalink: string;
   selftext?: string;
   comments: RedditComment[];
+  isNewlyFetched?: boolean;
 };
 
 // For same-domain deployment, we can use a relative URL
