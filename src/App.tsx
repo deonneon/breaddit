@@ -8,7 +8,15 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import { renderMarkdown } from "./utils/markdownUtils";
 
 const formatDate = (timestamp: number): string => {
-  return new Date(timestamp * 1000).toLocaleDateString("en-US", {
+  const date = new Date(timestamp * 1000);
+  const today = new Date();
+  
+  // Simple check if date is today by comparing date strings
+  if (date.toDateString() === today.toDateString()) {
+    return `Today at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+  }
+  
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -231,10 +239,10 @@ const App = () => {
               onClick={() => setSelectedPostIndex(index)}
               className={`px-3 md:px-4 py-2 h-auto min-h-16 rounded-lg text-sm w-full text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow ${
                 selectedPostIndex === index
-                  ? "bg-orange-500 text-white shadow-md transform scale-[1.02]"
+                  ? `bg-orange-500 text-white shadow-md transform scale-[1.02] ${post.isNewlyFetched ? 'border-l-2 border-green-300' : ''}`
                   : post.isNewlyFetched 
-                    ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-2 border-green-500"
-                    : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-2 border-green-500'
+                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
               aria-label={`Select post "${post.title}${post.isNewlyFetched ? ' (New)' : ''}"`}
               title={post.title}
@@ -250,14 +258,6 @@ const App = () => {
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300"
           >
             <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center">
-              {posts[selectedPostIndex].isNewlyFetched && (
-                <span className="inline-flex items-center px-2 py-0.5 mr-2 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                  New
-                </span>
-              )}
               {posts[selectedPostIndex].title}
             </h5>
             
