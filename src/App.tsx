@@ -52,17 +52,35 @@ const App = () => {
     return savedPreference === "true";
   });
 
+  // State for storing IDs of read posts with timestamps
+  const [readPosts, setReadPosts] = useState<Record<string, number>>(() => {
+    const savedReadPosts = localStorage.getItem("readPosts");
+    return savedReadPosts ? JSON.parse(savedReadPosts) : {};
+  });
+
   // Default subreddits that are always available
   const defaultSubreddits = ["thewallstreet", "stocks", "singularity", "localllama", "wallstreetbets"];
   
   // Default post limits for each subreddit
   const subredditPostLimits: Record<string, number> = {
     "thewallstreet":3,
-    "stocks": 4,
+    "stocks": 2,
     "singularity": 8,
     "localllama": 8,
     "wallstreetbets": 8
   };
+
+  // Function to mark a post as read
+  const markPostAsRead = useCallback((postId: string) => {
+    if (!readPosts[postId]) {
+      const updatedReadPosts = {
+        ...readPosts,
+        [postId]: Date.now() // Store current timestamp
+      };
+      setReadPosts(updatedReadPosts);
+      localStorage.setItem("readPosts", JSON.stringify(updatedReadPosts));
+    }
+  }, [readPosts]);
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -76,6 +94,45 @@ const App = () => {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
+
+  // Clean up old read posts after 2 days
+  useEffect(() => {
+    const cleanup = () => {
+      const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000;
+      const cachedPostsData = Object.values(cachedPosts);
+      const allPostIds = new Set<string>();
+      
+      // Collect all current post IDs
+      cachedPostsData.forEach(data => {
+        data.posts.forEach(post => {
+          allPostIds.add(post.permalink);
+        });
+      });
+      
+      // Create updated read posts object
+      const updatedReadPosts: Record<string, number> = {};
+      
+      // Keep only posts that:
+      // 1. Still exist in the cache AND
+      // 2. Are less than 2 days old
+      Object.entries(readPosts).forEach(([id, timestamp]) => {
+        if (allPostIds.has(id) && timestamp > twoDaysAgo) {
+          updatedReadPosts[id] = timestamp;
+        }
+      });
+      
+      // Only update if there were changes
+      if (Object.keys(updatedReadPosts).length !== Object.keys(readPosts).length) {
+        setReadPosts(updatedReadPosts);
+        localStorage.setItem("readPosts", JSON.stringify(updatedReadPosts));
+      }
+    };
+    
+    cleanup();
+    // Run cleanup every day
+    const cleanupInterval = setInterval(cleanup, 24 * 60 * 60 * 1000);
+    return () => clearInterval(cleanupInterval);
+  }, [cachedPosts, readPosts]);
 
   const handleFetchPosts = useCallback(async () => {
     try {
@@ -236,15 +293,18 @@ const App = () => {
           {posts.map((post, index) => (
             <button
               key={post.permalink}
-              onClick={() => setSelectedPostIndex(index)}
+              onClick={() => {
+                setSelectedPostIndex(index);
+                markPostAsRead(post.permalink);
+              }}
               className={`px-3 md:px-4 py-2 h-auto min-h-16 rounded-lg text-sm w-full text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow ${
                 selectedPostIndex === index
-                  ? `bg-orange-500 text-white shadow-md transform scale-[1.02] ${post.isNewlyFetched ? 'border-l-2 border-green-300' : ''}`
-                  : post.isNewlyFetched 
+                  ? `bg-orange-500 text-white shadow-md transform scale-[1.02] ${post.isNewlyFetched && !readPosts[post.permalink] ? 'border-l-2 border-green-300' : ''}`
+                  : post.isNewlyFetched && !readPosts[post.permalink]
                     ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-2 border-green-500'
                     : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
-              aria-label={`Select post "${post.title}${post.isNewlyFetched ? ' (New)' : ''}"`}
+              aria-label={`Select post "${post.title}${(post.isNewlyFetched && !readPosts[post.permalink]) ? ' (New)' : ''}"`}
               title={post.title}
             >
               <div className="line-clamp-3">{post.title}</div>
