@@ -36,6 +36,9 @@ interface Comment {
   depth: number;
 }
 
+// Define valid sort types
+type SortType = 'hot' | 'new';
+
 /**
  * Recursively structure a comment and its replies.
  * For brevity, this example processes only top-level comments.
@@ -60,10 +63,17 @@ async function fetchComments(comment: snoowrap.Comment): Promise<Comment> {
 /**
  * Fetch posts and their comments from a given subreddit.
  */
-async function fetchSubredditData(subredditName: string, limit: number = 4) {
+async function fetchSubredditData(subredditName: string, limit: number = 4, sort: SortType = 'hot') {
   const subreddit = reddit.getSubreddit(subredditName);
-  // Fetch the hottest posts with the specified limit
-  const submissions = await subreddit.getHot({ limit });
+  
+  // Fetch posts based on the sort parameter
+  let submissions;
+  if (sort === 'new') {
+    submissions = await subreddit.getNew({ limit });
+  } else {
+    // Default to hot
+    submissions = await subreddit.getHot({ limit });
+  }
 
   const postsData = await Promise.all(
     submissions.map(async (submission) => {
@@ -96,9 +106,15 @@ async function fetchSubredditData(subredditName: string, limit: number = 4) {
 app.get("/api/posts/:subreddit", async (req, res) => {
   const subreddit = req.params.subreddit;
   const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+  const sort = (req.query.sort as SortType) || 'hot';
+  
+  // Validate sort parameter
+  if (sort !== 'hot' && sort !== 'new') {
+    return res.status(400).json({ error: "Sort parameter must be either 'hot' or 'new'" });
+  }
   
   try {
-    const data = await fetchSubredditData(subreddit, limit);
+    const data = await fetchSubredditData(subreddit, limit, sort);
     res.json(data);
   } catch (error) {
     console.error("Error fetching subreddit data:", error);

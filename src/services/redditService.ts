@@ -16,6 +16,9 @@ type RedditPost = {
   isNewlyFetched?: boolean;
 };
 
+// Define valid sort types
+type SortType = 'hot' | 'new';
+
 // For same-domain deployment, we can use a relative URL
 // In development, we'll use the full URL from the environment variable
 const API_BASE_URL = import.meta.env.DEV 
@@ -24,7 +27,8 @@ const API_BASE_URL = import.meta.env.DEV
 
 const fetchSubredditPosts = async (
   subreddit: string,
-  limit?: number
+  limit?: number,
+  sort: SortType = 'hot'
 ): Promise<RedditPost[]> => {
   try {
     // Fix URL construction to work with both absolute and relative paths
@@ -39,6 +43,9 @@ const fetchSubredditPosts = async (
     if (limit) {
       url.searchParams.append('limit', limit.toString());
     }
+    
+    // Add sort parameter
+    url.searchParams.append('sort', sort);
     
     const response = await fetch(url.toString(), {
       headers: {
@@ -59,4 +66,4 @@ const fetchSubredditPosts = async (
 };
 
 export { fetchSubredditPosts };
-export type { RedditPost, RedditComment };
+export type { RedditPost, RedditComment, SortType };

@@ -1,7 +1,7 @@
 // App.tsx
 import { useState, useEffect, useCallback } from "react";
 import { fetchSubredditPosts } from "./services/redditService";
-import type { RedditPost } from "./services/redditService";
+import type { RedditPost, SortType } from "./services/redditService";
 import Sidebar from "./components/Sidebar";
 import Comment from "./components/Comment";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -32,6 +32,11 @@ interface CachedPosts {
   };
 }
 
+// Interface for storing sort preferences by subreddit
+interface SubredditSortPreferences {
+  [subreddit: string]: SortType;
+}
+
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const App = () => {
@@ -42,6 +47,13 @@ const App = () => {
   const [cachedPosts, setCachedPosts] = useState<CachedPosts>({});
   const [selectedPostIndex, setSelectedPostIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Add state for sort preferences with localStorage persistence
+  const [sortPreferences, setSortPreferences] = useState<SubredditSortPreferences>(() => {
+    const savedPreferences = localStorage.getItem("sortPreferences");
+    return savedPreferences ? JSON.parse(savedPreferences) : {};
+  });
+  
   const [darkMode, setDarkMode] = useState(() => {
     // Check if user has a preference stored
     const savedPreference = localStorage.getItem("darkMode");
@@ -134,6 +146,61 @@ const App = () => {
     return () => clearInterval(cleanupInterval);
   }, [cachedPosts, readPosts]);
 
+  // Function to get current sort preference for the active subreddit
+  const getCurrentSortPreference = useCallback((): SortType => {
+    return sortPreferences[subreddit] || 'hot';
+  }, [subreddit, sortPreferences]);
+
+  // Function to update sort preference for a subreddit
+  const updateSortPreference = useCallback((newSort: SortType) => {
+    const updatedPreferences = {
+      ...sortPreferences,
+      [subreddit]: newSort
+    };
+    setSortPreferences(updatedPreferences);
+    localStorage.setItem("sortPreferences", JSON.stringify(updatedPreferences));
+    
+    // Refresh posts with the new sort preference
+    refreshPostsWithSort(newSort);
+  }, [subreddit, sortPreferences]);
+
+  // Function to refresh posts with a specific sort option
+  const refreshPostsWithSort = useCallback(async (sort: SortType) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const postLimit = subredditPostLimits[subreddit] || 4;
+      const data = await fetchSubredditPosts(subreddit, postLimit, sort);
+      
+      // Mark posts as newly fetched
+      const markedData = data.map(post => ({
+        ...post,
+        isNewlyFetched: true
+      }));
+      
+      setPosts(markedData);
+      setSelectedPostIndex(0); // Reset selected post when changing sort
+      
+      // Update cache with fresh data
+      setCachedPosts((prev) => ({
+        ...prev,
+        [subreddit]: {
+          posts: markedData,
+          timestamp: Date.now(),
+        },
+      }));
+    } catch (error) {
+      setError(
+        `Failed to refresh posts: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [subreddit]);
+
   const handleFetchPosts = useCallback(async () => {
     try {
       setLoading(true);
@@ -141,6 +208,7 @@ const App = () => {
 
       const cachedData = cachedPosts[subreddit];
       const now = Date.now();
+      const currentSort = getCurrentSortPreference();
 
       if (cachedData && now - cachedData.timestamp < CACHE_DURATION) {
         console.log(`Using cached data for subreddit: ${subreddit}`);
@@ -151,7 +219,7 @@ const App = () => {
 
       // Get the post limit for the current subreddit or use default of 4
       const postLimit = subredditPostLimits[subreddit] || 4;
-      const data = await fetchSubredditPosts(subreddit, postLimit);
+      const data = await fetchSubredditPosts(subreddit, postLimit, currentSort);
       
       // Mark posts as newly fetched
       const markedData = data.map(post => ({
@@ -181,15 +249,16 @@ const App = () => {
     } finally {
       setLoading(false);
     }
-  }, [subreddit, cachedPosts]);
+  }, [subreddit, cachedPosts, getCurrentSortPreference]);
 
   // Force refresh posts for the current subreddit
   const refreshPosts = useCallback(async () => {
+    const currentSort = getCurrentSortPreference();
     try {
       setLoading(true);
       setError(null);
 
-      const data = await fetchSubredditPosts(subreddit);
+      const data = await fetchSubredditPosts(subreddit, undefined, currentSort);
       
       // Mark posts as newly fetched
       const markedData = data.map(post => ({
@@ -216,7 +285,7 @@ const App = () => {
     } finally {
       setLoading(false);
     }
-  }, [subreddit]);
+  }, [subreddit, getCurrentSortPreference]);
 
   const handleSubredditSelect = (selectedSubreddit: string) => {
     setSubreddit(selectedSubreddit);
@@ -273,11 +342,38 @@ const App = () => {
 
     return (
       <div className="w-full p-4 md:p-8 overflow-y-auto h-full bg-gray-50 dark:bg-gray-900">
-        {/* Subreddit title and refresh button - visible only on desktop */}
+        {/* Subreddit title, sort options, and refresh button - visible only on desktop */}
         <div className="hidden md:flex items-center mb-6 gap-2">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
             <span className="text-orange-500 mr-2">r/</span>{subreddit}
           </h1>
+          
+          {/* Sort options */}
+          <div className="flex items-center ml-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => updateSortPreference('hot')}
+              className={`px-3 py-1 text-sm rounded-l-lg transition-colors ${
+                getCurrentSortPreference() === 'hot'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+              aria-label="Sort by hot"
+            >
+              Hot
+            </button>
+            <button
+              onClick={() => updateSortPreference('new')}
+              className={`px-3 py-1 text-sm rounded-r-lg transition-colors ${
+                getCurrentSortPreference() === 'new'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+              aria-label="Sort by new"
+            >
+              New
+            </button>
+          </div>
+          
           <button
             onClick={refreshPosts}
             className="p-2 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:rotate-180 duration-500"
@@ -402,11 +498,36 @@ const App = () => {
           </h1>
         </div>
         
-        {/* Subreddit title and refresh in navbar for mobile */}
+        {/* Subreddit title, sort options, and refresh in navbar for mobile */}
         <div className="flex items-center">
           <h2 className="text-lg font-medium text-gray-800 dark:text-white mr-2 flex items-center">
             <span className="text-orange-500 text-sm mr-1">r/</span>{subreddit}
           </h2>
+          
+          {/* Mobile sort toggle */}
+          <div className="flex mr-2 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
+            <button
+              onClick={() => updateSortPreference('hot')}
+              className={`px-2 py-1 text-xs ${
+                getCurrentSortPreference() === 'hot'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Hot
+            </button>
+            <button
+              onClick={() => updateSortPreference('new')}
+              className={`px-2 py-1 text-xs ${
+                getCurrentSortPreference() === 'new'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              New
+            </button>
+          </div>
+          
           <button
             onClick={refreshPosts}
             className="p-2 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-transform hover:rotate-180 duration-500"
