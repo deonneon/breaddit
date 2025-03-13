@@ -453,6 +453,50 @@ const App = () => {
               </div>
             )}
 
+            {/* Display post image if it exists */}
+            {!posts[selectedPostIndex].is_self && (
+              <div className="mt-2 mb-2">
+                {posts[selectedPostIndex].is_video ? (
+                  <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 text-center">
+                    <a 
+                      href={posts[selectedPostIndex].url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View video on Reddit
+                    </a>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex justify-center">
+                    <img 
+                      src={posts[selectedPostIndex].url_overridden_by_dest || posts[selectedPostIndex].url} 
+                      alt={posts[selectedPostIndex].title}
+                      className="max-w-full h-auto rounded-md"
+                      loading="lazy"
+                      onError={(e) => {
+                        // If image fails to load, show a link instead
+                        const target = e.target as HTMLImageElement;
+                        const container = target.parentElement;
+                        if (container) {
+                          container.innerHTML = `
+                            <a 
+                              href="${posts[selectedPostIndex].url}" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              class="text-blue-600 hover:underline"
+                            >
+                              View content on Reddit
+                            </a>
+                          `;
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="mt-3 md:mt-4 space-y-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -94,6 +94,13 @@ async function fetchSubredditData(subredditName: string, limit: number = 4, sort
         created_utc: submission.created_utc,
         permalink: submission.permalink,
         selftext: submission.selftext,
+        url: submission.url,
+        thumbnail: submission.thumbnail,
+        // Use any type assertion for properties that might not be directly defined in the type
+        url_overridden_by_dest: (submission as any).url_overridden_by_dest,
+        is_self: submission.is_self,
+        is_video: submission.is_video,
+        post_hint: (submission as any).post_hint,
         comments,
       };
     })

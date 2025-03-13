@@ -12,6 +12,12 @@ type RedditPost = {
   created_utc: number;
   permalink: string;
   selftext?: string;
+  url?: string;
+  thumbnail?: string;
+  url_overridden_by_dest?: string;
+  is_self?: boolean;
+  is_video?: boolean;
+  post_hint?: string;
   comments: RedditComment[];
   isNewlyFetched?: boolean;
 };

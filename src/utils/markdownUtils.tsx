@@ -38,25 +38,26 @@ export const renderMarkdown = (text: string) => {
           const isInline = !match;
           
           return isInline ? (
-            <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded text-xs md:text-sm">
+            <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs md:text-sm">
               {children}
             </code>
           ) : (
-            <pre className="bg-gray-200 dark:bg-gray-800 p-2 rounded overflow-x-auto mb-2">
-              <code className={`text-xs dark:bg-gray-800 md:text-sm ${className}`}>
+            <pre className="bg-gray-200 dark:bg-gray-700 p-2 rounded overflow-x-auto mb-2">
+              <code className={`text-xs md:text-sm ${className}`}>
                 {children}
               </code>
             </pre>
           );
         },
-        // Add custom image rendering
+        // Add support for images
         img: ({ src, alt }) => (
           <img 
             src={src} 
-            alt={alt} 
-            className="max-w-full h-auto mb-2" 
+            alt={alt || 'Post image'} 
+            className="max-w-full h-auto rounded-md my-2"
+            loading="lazy"
           />
-        ),
+        )
       }}
     >
       {text}
