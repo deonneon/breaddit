@@ -43,12 +43,20 @@ export const renderMarkdown = (text: string) => {
             </code>
           ) : (
             <pre className="bg-gray-200 dark:bg-gray-800 p-2 rounded overflow-x-auto mb-2">
-              <code className={`text-xs md:text-sm ${className}`}>
+              <code className={`text-xs dark:bg-gray-800 md:text-sm ${className}`}>
                 {children}
               </code>
             </pre>
           );
         },
+        // Add custom image rendering
+        img: ({ src, alt }) => (
+          <img 
+            src={src} 
+            alt={alt} 
+            className="max-w-full h-auto mb-2" 
+          />
+        ),
       }}
     >
       {text}

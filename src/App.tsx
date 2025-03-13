@@ -493,9 +493,6 @@ const App = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <h1 className="ml-4 text-xl font-bold text-gray-800 dark:text-white flex items-center">
-            <span className="text-orange-500 mr-1">B</span>readdit
-          </h1>
         </div>
         
         {/* Subreddit title, sort options, and refresh in navbar for mobile */}
