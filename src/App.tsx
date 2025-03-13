@@ -537,19 +537,11 @@ const App = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-        </div>
-        
-        {/* Subreddit title, sort options, and refresh in navbar for mobile */}
-        <div className="flex items-center">
-          <h2 className="text-lg font-medium text-gray-800 dark:text-white mr-2 flex items-center">
-            <span className="text-orange-500 text-sm mr-1">r/</span>{subreddit}
-          </h2>
-          
           {/* Mobile sort toggle */}
-          <div className="flex mr-2 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
+          <div className="flex ml-5 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
             <button
               onClick={() => updateSortPreference('hot')}
-              className={`px-2 py-1 text-xs ${
+              className={`px-4 py-1 text-xs ${
                 getCurrentSortPreference() === 'hot'
                   ? 'bg-orange-500 text-white'
                   : 'text-gray-700 dark:text-gray-300'
@@ -559,7 +551,7 @@ const App = () => {
             </button>
             <button
               onClick={() => updateSortPreference('new')}
-              className={`px-2 py-1 text-xs ${
+              className={`px-4 py-1 text-xs ${
                 getCurrentSortPreference() === 'new'
                   ? 'bg-orange-500 text-white'
                   : 'text-gray-700 dark:text-gray-300'
@@ -568,6 +560,15 @@ const App = () => {
               New
             </button>
           </div>
+        </div>
+        
+        {/* Subreddit title, sort options, and refresh in navbar for mobile */}
+        <div className="flex items-center">
+          <h2 className="text-lg font-medium text-gray-800 dark:text-white mr-2 flex items-center">
+            <span className="text-orange-500 text-sm mr-1">r/</span>{subreddit}
+          </h2>
+          
+          
           
           <button
             onClick={refreshPosts}
