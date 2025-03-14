@@ -54,15 +54,6 @@ const App = () => {
     return savedPreferences ? JSON.parse(savedPreferences) : {};
   });
   
-  const [darkMode, setDarkMode] = useState(() => {
-    // Check if user has a preference stored
-    const savedPreference = localStorage.getItem("darkMode");
-    // If no preference, use system preference
-    if (savedPreference === null) {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return savedPreference === "true";
-  });
 
   // State for storing IDs of read posts with timestamps
   const [readPosts, setReadPosts] = useState<Record<string, number>>(() => {
@@ -94,18 +85,6 @@ const App = () => {
     }
   }, [readPosts]);
 
-  // Toggle dark mode
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    localStorage.setItem("darkMode", String(newMode));
-    document.documentElement.classList.toggle("dark", newMode);
-  };
-
-  // Set initial dark mode class on document
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
 
   // Clean up old read posts after 2 days
   useEffect(() => {
@@ -524,7 +503,7 @@ const App = () => {
   };
 
   return (
-    <div className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden ${darkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden`}>
       {/* Mobile Header with Hamburger */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 shrink-0 shadow-sm">
         <div className="flex items-center">
@@ -593,8 +572,6 @@ const App = () => {
           subreddits={defaultSubreddits}
           selectedSubreddit={subreddit}
           onSubredditSelect={handleSubredditSelect}
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
         />
       </div>
 

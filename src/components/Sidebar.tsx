@@ -4,16 +4,12 @@ interface SidebarProps {
   subreddits: string[];
   selectedSubreddit: string;
   onSubredditSelect: (subreddit: string) => void;
-  darkMode: boolean;
-  toggleDarkMode: () => void;
 }
 
 const Sidebar = ({
   subreddits,
   selectedSubreddit,
   onSubredditSelect,
-  darkMode,
-  toggleDarkMode,
 }: SidebarProps) => {
   const [inputSubreddit, setInputSubreddit] = useState("");
   const [mySubreddits, setMySubreddits] = useState<string[]>([]);
