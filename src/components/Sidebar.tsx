@@ -59,11 +59,11 @@ const Sidebar = ({
 
   return (
     <aside className="w-full h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white overflow-y-auto flex flex-col border-r border-gray-200 dark:border-gray-700">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div className="hidden sm:block p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <h1 className="text-xl font-bold flex items-center">
           <span className="text-orange-500 mr-1">B</span>readdit
         </h1>
-        <button 
+        {/* <button 
           onClick={toggleDarkMode}
           className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
@@ -77,7 +77,7 @@ const Sidebar = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
             </svg>
           )}
-        </button>
+        </button> */}
       </div>
 
       <div className="p-4">
