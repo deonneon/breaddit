@@ -39,7 +39,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
   const getIndentClass = () => {
     if (depth === 0) return "";
     // Reduce indentation on mobile
-    return `ml-${Math.min(depth * 2, 6)} md:ml-${Math.min(depth * 4, 16)}`;
+    return `ml-${Math.min(depth * 3, 6)} md:ml-${Math.min(depth * 4, 16)}`;
   };
   
   // Different border colors for different nesting levels
