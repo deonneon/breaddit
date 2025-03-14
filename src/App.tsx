@@ -280,6 +280,14 @@ const App = () => {
     handleFetchPosts();
   }, [handleFetchPosts]);
 
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add('overflow-hidden'); // Disable scrolling
+    } else {
+      document.body.classList.remove('overflow-hidden'); // Enable scrolling
+    }
+  }, [sidebarOpen]);
+
   const MainContent = () => {
     if (loading) {
       return (
