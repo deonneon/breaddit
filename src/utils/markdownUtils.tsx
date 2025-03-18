@@ -26,7 +26,7 @@ export const renderMarkdown = (text: string) => {
         ol: ({ children }) => <ol className="list-decimal ml-5 mb-2">{children}</ol>,
         li: ({ children }) => <li className="mb-1 text-xs md:text-base">{children}</li>,
         blockquote: ({ children }) => (
-          <blockquote className="border-l-4 border-gray-400 pl-2 italic text-gray-700 dark:text-gray-400 mb-2">
+          <blockquote className="border-l-4 border-gray-400 pl-4 italic text-gray-700 dark:text-gray-400 mb-2">
             {children}
           </blockquote>
         ),
