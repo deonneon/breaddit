@@ -1,5 +1,5 @@
 // App.tsx
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { fetchSubredditPosts } from "./services/redditService";
 import type { RedditPost, SortType } from "./services/redditService";
 import Sidebar from "./components/Sidebar";
@@ -287,6 +287,51 @@ const App = () => {
       document.body.classList.remove('overflow-hidden'); // Enable scrolling
     }
   }, [sidebarOpen]);
+
+ // Add state to track if we should show the scroll to top button
+ const [showScrollTop, setShowScrollTop] = useState(false);
+ // Create a ref for the scrollable content container
+ const scrollContainerRef = useRef<HTMLDivElement>(null);
+ // Create a ref for an element at the top of the page (for intersection observer)
+ const topMarkerRef = useRef<HTMLDivElement>(null);
+
+ // Use IntersectionObserver to detect when we've scrolled past the top
+ useEffect(() => {
+   // Only set up on mobile
+   const isMobile = window.innerWidth < 768;
+   if (!isMobile || !topMarkerRef.current) return;
+   
+   const options = {
+     root: scrollContainerRef.current,
+     threshold: 0,
+     rootMargin: '-200px 0px 0px 0px' // Consider it "out of view" when 200px down
+   };
+   
+   const observer = new IntersectionObserver((entries) => {
+     // When topMarker is not intersecting, we've scrolled down
+     const [entry] = entries;
+     setShowScrollTop(!entry.isIntersecting);
+     console.log("Intersection state:", !entry.isIntersecting);
+   }, options);
+   
+   observer.observe(topMarkerRef.current);
+   
+   return () => {
+     if (topMarkerRef.current) {
+       observer.unobserve(topMarkerRef.current);
+     }
+   };
+ }, []);
+
+ // Function to scroll to top
+ const scrollToTop = () => {
+   if (scrollContainerRef.current) {
+     scrollContainerRef.current.scrollTo({
+       top: 0,
+       behavior: 'smooth'
+     });
+   }
+ };
 
   const MainContent = () => {
     if (loading) {
@@ -593,8 +638,41 @@ const App = () => {
       )}
 
       <main className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto relative">
+          {/* Intersection observer marker at the top */}
+          <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
+          
           <MainContent />
+          
+          {/* Scroll to top button */}
+          <button
+            onClick={scrollToTop}
+            className={`
+              fixed bottom-4 right-7 z-50
+              md:hidden
+              ${showScrollTop ? 'opacity-70 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
+              bg-gray-800/70 hover:bg-gray-700 text-white
+              rounded-full p-2 shadow-md backdrop-blur-sm
+              transition-all duration-200
+            `}
+            aria-label="Scroll to top"
+            title="Back to top"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                d="M5 10l7-7m0 0l7 7m-7-7v18" 
+              />
+            </svg>
+          </button>
         </div>
       </main>
     </div>
