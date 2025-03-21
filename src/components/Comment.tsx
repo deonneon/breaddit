@@ -60,7 +60,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
   // Add a special border for new comments
   const getCommentClass = () => {
     if (comment.isNew) {
-      return "border-l-2 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/10";
+      return "border-l-2 border-green-500 dark:border-green-400 bg-green-50/80 dark:bg-green-900/20 shadow-sm";
     }
 
     return depth > 0 ? `border-l-1 ${getBorderColor()} border-dotted` : "";
@@ -86,7 +86,8 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
             {formatDate(timestamp)}
           </span>
           {comment.isNew && (
-            <span className="ml-2 text-xs font-medium text-green-600 dark:text-green-400 px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30">
+            <span className="ml-2 text-xs font-medium text-green-600 dark:text-green-400 px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span>
               new
             </span>
           )}

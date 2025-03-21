@@ -47,12 +47,12 @@ interface SubredditSortPreferences {
 // Interface for tracking seen comment IDs by post permalink
 interface SeenComments {
   [postPermalink: string]: {
-    commentIds: Set<string>;
+    commentIds: string[];
     lastFetchTime: number;
   };
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const CACHE_DURATION = 1 * 60 * 1000; // 1 minute in milliseconds
 
 const App = () => {
   const [posts, setPosts] = useState<RedditPost[]>([]);
@@ -62,7 +62,12 @@ const App = () => {
   const [cachedPosts, setCachedPosts] = useState<CachedPosts>({});
   const [selectedPostIndex, setSelectedPostIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [seenComments, setSeenComments] = useState<SeenComments>({});
+
+  // Initialize seenComments from localStorage if available
+  const [seenComments, setSeenComments] = useState<SeenComments>(() => {
+    const savedSeenComments = localStorage.getItem("seenComments");
+    return savedSeenComments ? JSON.parse(savedSeenComments) : {};
+  });
 
   // Add state for sort preferences with localStorage persistence
   const [sortPreferences, setSortPreferences] =
@@ -220,12 +225,24 @@ const App = () => {
     (comments: RedditComment[], postPermalink: string): RedditComment[] => {
       if (!comments || !Array.isArray(comments)) return [];
 
-      const postSeenComments =
-        seenComments[postPermalink]?.commentIds || new Set<string>();
+      // Check if this is the first time we're seeing this thread
+      const isFirstTimeSeenThread = !seenComments[postPermalink];
+      const postSeenComments = seenComments[postPermalink]?.commentIds || [];
+
+      // Debug info
+      console.log(`Marking comments for ${postPermalink}`, {
+        totalComments: comments.length,
+        knownCommentIds: postSeenComments.length,
+        isFirstTimeSeenThread,
+        seenCommentsKeys: Object.keys(seenComments),
+      });
 
       return comments.map((comment) => {
-        // Mark as new if this comment ID hasn't been seen before
-        const isNew = !postSeenComments.has(comment.id);
+        // Only mark as new if:
+        // 1. This is NOT the first time we're seeing this thread AND
+        // 2. This comment ID hasn't been seen before
+        const isNew =
+          !isFirstTimeSeenThread && !postSeenComments.includes(comment.id);
 
         // Recursively process replies
         const processedReplies = comment.replies
@@ -244,11 +261,13 @@ const App = () => {
 
   // Function to collect all comment IDs from a post
   const collectCommentIds = useCallback(
-    (comments: RedditComment[]): Set<string> => {
-      const ids = new Set<string>();
+    (comments: RedditComment[]): string[] => {
+      const ids: string[] = [];
 
       const processComment = (comment: RedditComment) => {
-        ids.add(comment.id);
+        if (!ids.includes(comment.id)) {
+          ids.push(comment.id);
+        }
 
         if (comment.replies && comment.replies.length > 0) {
           comment.replies.forEach(processComment);
@@ -257,6 +276,25 @@ const App = () => {
 
       comments.forEach(processComment);
       return ids;
+    },
+    []
+  );
+
+  // Helper function to check if a comment thread has any new comments
+  const checkForNewComments = useCallback(
+    (comments: RedditComment[]): boolean => {
+      if (!comments || !Array.isArray(comments)) return false;
+
+      for (const comment of comments) {
+        if (comment.isNew) return true;
+
+        if (comment.replies && comment.replies.length > 0) {
+          const hasNewReplies = checkForNewComments(comment.replies);
+          if (hasNewReplies) return true;
+        }
+      }
+
+      return false;
     },
     []
   );
@@ -273,13 +311,24 @@ const App = () => {
       if (cachedData && now - cachedData.timestamp < CACHE_DURATION) {
         console.log(`Using cached data for subreddit: ${subreddit}`);
 
-        // Mark posts as not newly fetched (they're from cache)
-        const markedData = cachedData.posts.map((post) => ({
-          ...post,
-          isNewlyFetched: false,
+        // We're using cached data - mark posts as not newly fetched
+        // but still process for new comments compared to known comment IDs
+        const markedData = cachedData.posts.map((post) => {
+          console.log(`Using cached data for post: ${post.permalink}`);
+
           // Process comments to mark any new ones based on the post's permalink
-          comments: markNewComments(post.comments, post.permalink),
-        }));
+          // This will highlight any new comments since last time we saw them
+          const processedComments = markNewComments(
+            post.comments,
+            post.permalink
+          );
+
+          return {
+            ...post,
+            isNewlyFetched: false,
+            comments: processedComments,
+          };
+        });
 
         setPosts(markedData);
         setLoading(false);
@@ -294,17 +343,37 @@ const App = () => {
       const processedData = data.map((post) => {
         // Check if we've seen comments from this post before
         const postPermalink = post.permalink;
+
+        // Process to mark new comments (and build a list of all comments)
         const processedComments = markNewComments(post.comments, postPermalink);
 
-        // Update seen comments for this post
-        const commentIds = collectCommentIds(post.comments);
-        setSeenComments((prev) => ({
-          ...prev,
-          [postPermalink]: {
-            commentIds,
-            lastFetchTime: now,
-          },
-        }));
+        // Get all comment IDs for this post
+        const allCommentIds = collectCommentIds(post.comments);
+
+        // Check if this is the first time we're seeing this post
+        const isFirstTimeSeenPost = !seenComments[postPermalink];
+
+        // If this is the first time we're seeing this post, store its comments immediately
+        // so future refreshes will be able to detect new comments
+        if (isFirstTimeSeenPost) {
+          setSeenComments((prev) => ({
+            ...prev,
+            [postPermalink]: {
+              commentIds: allCommentIds,
+              lastFetchTime: now,
+            },
+          }));
+        }
+
+        // Check if this post has any new comments (only possible for posts we've seen before)
+        const hasNewComments =
+          !isFirstTimeSeenPost && checkForNewComments(processedComments);
+
+        // Store update info for applying after render
+        post._updateInfo = {
+          hasNewComments,
+          allCommentIds,
+        };
 
         return {
           ...post,
@@ -325,6 +394,35 @@ const App = () => {
           timestamp: now,
         },
       }));
+
+      // After a delay, only update seen comments for posts with new comments
+      // (we already immediately updated first-time posts above)
+      setTimeout(() => {
+        processedData.forEach((post) => {
+          if (post._updateInfo?.hasNewComments) {
+            const postPermalink = post.permalink;
+            const allCommentIds = post._updateInfo.allCommentIds;
+
+            setSeenComments((prev) => {
+              // Don't lose track of what we already know about this post's comments
+              const existingIds = prev[postPermalink]?.commentIds || [];
+
+              // Combine existing and new IDs without duplicates
+              const mergedIds = [
+                ...new Set([...existingIds, ...allCommentIds]),
+              ];
+
+              return {
+                ...prev,
+                [postPermalink]: {
+                  commentIds: mergedIds,
+                  lastFetchTime: now,
+                },
+              };
+            });
+          }
+        });
+      }, 30000); // 30 seconds delay
     } catch (error) {
       // Use the error parameter in the error message
       setError(
@@ -342,6 +440,7 @@ const App = () => {
     markNewComments,
     collectCommentIds,
     seenComments,
+    checkForNewComments,
   ]);
 
   // Force refresh posts for the current subreddit
@@ -355,20 +454,46 @@ const App = () => {
 
       // Process each post to mark new comments and store seen comment IDs
       const now = Date.now();
+
+      // Store all processed posts with potential new comments
       const processedData = data.map((post) => {
         // Check if we've seen comments from this post before
         const postPermalink = post.permalink;
+
+        // Get all comment IDs (both current and new)
+        const currentIds = seenComments[postPermalink]?.commentIds || [];
+        const isFirstTimeSeenPost = currentIds.length === 0;
+
+        console.log(
+          `Refreshing ${postPermalink}, current known IDs: ${currentIds.length}, first time: ${isFirstTimeSeenPost}`
+        );
+
+        // Mark new comments based on what we've seen before
         const processedComments = markNewComments(post.comments, postPermalink);
 
-        // Update seen comments for this post
-        const commentIds = collectCommentIds(post.comments);
-        setSeenComments((prev) => ({
-          ...prev,
-          [postPermalink]: {
-            commentIds,
-            lastFetchTime: now,
-          },
-        }));
+        // Get the full list of comment IDs from this refresh
+        const allCommentIds = collectCommentIds(post.comments);
+
+        // If this is the first time we're seeing this post, store its comments immediately
+        if (isFirstTimeSeenPost) {
+          setSeenComments((prev) => ({
+            ...prev,
+            [postPermalink]: {
+              commentIds: allCommentIds,
+              lastFetchTime: now,
+            },
+          }));
+        }
+
+        // Check if this post has any new comments (only possible for posts we've seen before)
+        const hasNewComments =
+          !isFirstTimeSeenPost && checkForNewComments(processedComments);
+
+        // Store update info for applying after render
+        post._updateInfo = {
+          hasNewComments,
+          allCommentIds,
+        };
 
         return {
           ...post,
@@ -377,6 +502,7 @@ const App = () => {
         };
       });
 
+      // Update UI with the processed posts first
       setPosts(processedData);
 
       // Update cache with fresh data
@@ -387,6 +513,24 @@ const App = () => {
           timestamp: now,
         },
       }));
+
+      // After a delay, update seenComments only for posts with new comments
+      setTimeout(() => {
+        processedData.forEach((post) => {
+          if (post._updateInfo?.hasNewComments) {
+            const postPermalink = post.permalink;
+            const allCommentIds = post._updateInfo.allCommentIds;
+
+            setSeenComments((prev) => ({
+              ...prev,
+              [postPermalink]: {
+                commentIds: allCommentIds,
+                lastFetchTime: now,
+              },
+            }));
+          }
+        });
+      }, 30000); // 30 seconds delay
     } catch (error) {
       setError(
         `Failed to refresh posts: ${
@@ -402,6 +546,7 @@ const App = () => {
     markNewComments,
     collectCommentIds,
     seenComments,
+    checkForNewComments,
   ]);
 
   // Function to refresh just the comments for the current post
@@ -434,6 +579,14 @@ const App = () => {
       );
 
       if (freshPost) {
+        // Check if this is the first time we're seeing this post's comments
+        const currentIds = seenComments[postPermalink]?.commentIds || [];
+        const isFirstTimeSeenPost = currentIds.length === 0;
+
+        console.log(
+          `Refreshing comments for ${postPermalink}, known IDs: ${currentIds.length}, first time: ${isFirstTimeSeenPost}`
+        );
+
         // Process the comments to mark new ones
         const now = Date.now();
         const processedComments = markNewComments(
@@ -441,15 +594,19 @@ const App = () => {
           postPermalink
         );
 
-        // Update seen comments for this post
-        const commentIds = collectCommentIds(freshPost.comments);
-        setSeenComments((prev) => ({
-          ...prev,
-          [postPermalink]: {
-            commentIds,
-            lastFetchTime: now,
-          },
-        }));
+        // Get new complete list of comment IDs
+        const allCommentIds = collectCommentIds(freshPost.comments);
+
+        // If this is the first time we're seeing this post, store its comments immediately
+        if (isFirstTimeSeenPost) {
+          setSeenComments((prev) => ({
+            ...prev,
+            [postPermalink]: {
+              commentIds: allCommentIds,
+              lastFetchTime: now,
+            },
+          }));
+        }
 
         // Update only the comments of the current post
         const updatedPost = {
@@ -476,6 +633,50 @@ const App = () => {
             },
           };
         });
+
+        // Check for new comments, but only if we've seen this post before
+        const countNewInComments = (comments: RedditComment[]): number => {
+          let count = 0;
+          if (!comments) return 0;
+
+          for (const comment of comments) {
+            if (comment.isNew) count++;
+            if (comment.replies && comment.replies.length > 0) {
+              count += countNewInComments(comment.replies);
+            }
+          }
+          return count;
+        };
+
+        const newCommentsCount = countNewInComments(processedComments);
+        if (!isFirstTimeSeenPost && newCommentsCount > 0) {
+          // Could add a toast notification here
+          console.log(`${newCommentsCount} new comments loaded`);
+
+          // Add a delay before updating seenComments to allow user to see what's new
+          // This will keep comments marked as "new" for 30 seconds
+          setTimeout(() => {
+            setSeenComments((prev) => ({
+              ...prev,
+              [postPermalink]: {
+                commentIds: allCommentIds,
+                lastFetchTime: now,
+              },
+            }));
+          }, 30000); // 30 seconds delay
+        } else {
+          // For first-time posts, we already updated seenComments above
+          // For posts with no new comments, update the lastFetchTime
+          if (!isFirstTimeSeenPost) {
+            setSeenComments((prev) => ({
+              ...prev,
+              [postPermalink]: {
+                commentIds: allCommentIds,
+                lastFetchTime: now,
+              },
+            }));
+          }
+        }
       }
     } catch (error) {
       console.error("Error refreshing comments:", error);
@@ -491,6 +692,8 @@ const App = () => {
     markNewComments,
     collectCommentIds,
     refreshPosts,
+    seenComments,
+    checkForNewComments,
   ]);
 
   const handleSubredditSelect = (selectedSubreddit: string) => {
@@ -560,7 +763,88 @@ const App = () => {
     }
   };
 
+  // Save seenComments to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("seenComments", JSON.stringify(seenComments));
+  }, [seenComments]);
+
   const MainContent = () => {
+    // Add a countdown timer for when new comments will be marked as seen
+    const [countdown, setCountdown] = useState<number | null>(null);
+
+    // Get the count of new comments for the selected post - only execute if posts are loaded
+    const countNewComments = useCallback(() => {
+      if (!posts[selectedPostIndex]) return 0;
+
+      let count = 0;
+      const countNew = (comments: RedditComment[]) => {
+        if (!comments) return;
+
+        for (const comment of comments) {
+          if (comment.isNew) count++;
+          if (comment.replies && comment.replies.length > 0) {
+            countNew(comment.replies);
+          }
+        }
+      };
+
+      countNew(posts[selectedPostIndex].comments);
+      return count;
+    }, [posts, selectedPostIndex]);
+
+    // Format the last fetch time - only execute if posts are loaded
+    const getLastFetchTime = useCallback(() => {
+      if (!posts[selectedPostIndex]) return null;
+      const permalink = posts[selectedPostIndex].permalink;
+      if (!permalink || !seenComments[permalink]) return null;
+
+      const lastFetchTime = new Date(seenComments[permalink].lastFetchTime);
+      return lastFetchTime.toLocaleTimeString();
+    }, [posts, selectedPostIndex, seenComments]);
+
+    // Calculate values only if posts are loaded
+    const newCommentsCount =
+      posts.length > 0 && selectedPostIndex < posts.length
+        ? countNewComments()
+        : 0;
+    const lastFetchTime =
+      posts.length > 0 && selectedPostIndex < posts.length
+        ? getLastFetchTime()
+        : null;
+
+    // Start countdown when we have new comments
+    useEffect(() => {
+      if (newCommentsCount > 0) {
+        // Only start the countdown for posts we've seen before - not for first loads
+        const postPermalink = posts[selectedPostIndex]?.permalink;
+        const isFirstTimeSeenPost = !(
+          postPermalink && seenComments[postPermalink]?.commentIds?.length > 0
+        );
+
+        if (!isFirstTimeSeenPost) {
+          setCountdown(30); // 30 seconds
+
+          const timer = setInterval(() => {
+            setCountdown((prev) => {
+              if (prev === null || prev <= 1) {
+                clearInterval(timer);
+                return null;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+
+          return () => clearInterval(timer);
+        }
+      } else {
+        setCountdown(null);
+      }
+    }, [
+      newCommentsCount,
+      posts.length > 0 ? posts[selectedPostIndex]?.permalink : null,
+      seenComments,
+    ]);
+
     if (loading) {
       return (
         <div className="w-full h-full min-h-screen flex items-center justify-center">
@@ -620,38 +904,6 @@ const App = () => {
         </div>
       );
     }
-
-    // Get the count of new comments for the selected post
-    const countNewComments = () => {
-      if (!posts[selectedPostIndex]) return 0;
-
-      let count = 0;
-      const countNew = (comments: RedditComment[]) => {
-        if (!comments) return;
-
-        for (const comment of comments) {
-          if (comment.isNew) count++;
-          if (comment.replies && comment.replies.length > 0) {
-            countNew(comment.replies);
-          }
-        }
-      };
-
-      countNew(posts[selectedPostIndex].comments);
-      return count;
-    };
-
-    // Format the last fetch time
-    const getLastFetchTime = () => {
-      const permalink = posts[selectedPostIndex]?.permalink;
-      if (!permalink || !seenComments[permalink]) return null;
-
-      const lastFetchTime = new Date(seenComments[permalink].lastFetchTime);
-      return lastFetchTime.toLocaleTimeString();
-    };
-
-    const newCommentsCount = countNewComments();
-    const lastFetchTime = getLastFetchTime();
 
     return (
       <div className="w-full p-4 md:p-8 overflow-y-auto h-full bg-gray-50 dark:bg-gray-900">
@@ -898,6 +1150,11 @@ const App = () => {
                   {lastFetchTime && (
                     <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">
                       Last updated: {lastFetchTime}
+                      {countdown !== null && (
+                        <span className="ml-2 text-green-600 dark:text-green-400">
+                          (marking as seen in {countdown}s)
+                        </span>
+                      )}
                     </span>
                   )}
                   <button

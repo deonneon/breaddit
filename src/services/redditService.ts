@@ -21,6 +21,10 @@ type RedditPost = {
   post_hint?: string;
   comments: RedditComment[];
   isNewlyFetched?: boolean;
+  _updateInfo?: {
+    hasNewComments: boolean;
+    allCommentIds: string[];
+  };
 };
 
 // Define valid sort types
