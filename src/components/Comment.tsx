@@ -93,7 +93,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
           )}
         </div>
         <div
-          className={`text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full prose dark:prose-invert prose-sm md:prose-base prose-orange ${
+          className={`comment-body text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full prose dark:prose-invert prose-sm md:prose-base prose-orange ${
             depth === 0 ? "ml-4" : ""
           }`}
         >

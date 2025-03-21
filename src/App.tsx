@@ -77,6 +77,12 @@ const App = () => {
       return savedPreferences ? JSON.parse(savedPreferences) : {};
     });
 
+  // Add state for font size with localStorage persistence
+  const [fontSize, setFontSize] = useState<string>(() => {
+    const savedFontSize = localStorage.getItem("fontSize");
+    return savedFontSize || "medium"; // Default to medium if not set
+  });
+
   // State for storing IDs of read posts with timestamps
   const [readPosts, setReadPosts] = useState<Record<string, number>>(() => {
     const savedReadPosts = localStorage.getItem("readPosts");
@@ -162,25 +168,6 @@ const App = () => {
     return sortPreferences[subreddit] || "hot";
   }, [subreddit, sortPreferences]);
 
-  // Function to update sort preference for a subreddit
-  const updateSortPreference = useCallback(
-    (newSort: SortType) => {
-      const updatedPreferences = {
-        ...sortPreferences,
-        [subreddit]: newSort,
-      };
-      setSortPreferences(updatedPreferences);
-      localStorage.setItem(
-        "sortPreferences",
-        JSON.stringify(updatedPreferences)
-      );
-
-      // Refresh posts with the new sort preference
-      refreshPostsWithSort(newSort);
-    },
-    [subreddit, sortPreferences]
-  );
-
   // Function to refresh posts with a specific sort option
   const refreshPostsWithSort = useCallback(
     async (sort: SortType) => {
@@ -218,7 +205,68 @@ const App = () => {
         setLoading(false);
       }
     },
-    [subreddit]
+    [
+      subreddit,
+      subredditPostLimits,
+      setLoading,
+      setError,
+      setPosts,
+      setSelectedPostIndex,
+      setCachedPosts,
+    ]
+  );
+
+  // Function to update sort preference for a subreddit
+  const updateSortPreference = useCallback(
+    (updateSubreddit: string, newSort: SortType) => {
+      const updatedPreferences = {
+        ...sortPreferences,
+        [updateSubreddit]: newSort,
+      };
+      setSortPreferences(updatedPreferences);
+      localStorage.setItem(
+        "sortPreferences",
+        JSON.stringify(updatedPreferences)
+      );
+
+      // Refresh posts if this is the currently viewed subreddit
+      if (updateSubreddit === subreddit) {
+        refreshPostsWithSort(newSort);
+      }
+    },
+    [sortPreferences, subreddit, refreshPostsWithSort]
+  );
+
+  // Function to update global sort preference
+  const updateGlobalSortPreference = useCallback(
+    (newSort: SortType) => {
+      // Remove the current subreddit from preferences to use global default
+      const updatedPreferences = { ...sortPreferences };
+      delete updatedPreferences["default"];
+
+      // Set a default preference
+      updatedPreferences["default"] = newSort;
+
+      setSortPreferences(updatedPreferences);
+      localStorage.setItem(
+        "sortPreferences",
+        JSON.stringify(updatedPreferences)
+      );
+
+      // Refresh posts if the current subreddit doesn't have a specific preference
+      if (!sortPreferences[subreddit]) {
+        refreshPostsWithSort(newSort);
+      }
+    },
+    [sortPreferences, subreddit, refreshPostsWithSort]
+  );
+
+  // Function to update sort preference for the current subreddit
+  const updateCurrentSortPreference = useCallback(
+    (newSort: SortType) => {
+      updateSortPreference(subreddit, newSort);
+    },
+    [subreddit, updateSortPreference]
   );
 
   // Helper function to recursively mark new comments by comparing with seen comments
@@ -769,6 +817,65 @@ const App = () => {
     localStorage.setItem("seenComments", JSON.stringify(seenComments));
   }, [seenComments]);
 
+  // Function to update font size
+  const updateFontSize = useCallback((size: string) => {
+    setFontSize(size);
+    localStorage.setItem("fontSize", size);
+  }, []);
+
+  // Update root element class based on font size
+  useEffect(() => {
+    // Remove any existing font size classes
+    document.documentElement.classList.remove(
+      "text-size-small",
+      "text-size-medium",
+      "text-size-large"
+    );
+
+    // Add the current font size class
+    document.documentElement.classList.add(`text-size-${fontSize}`);
+  }, [fontSize]);
+
+  // Initialize page zoom from localStorage
+  useEffect(() => {
+    // Ensure the viewport meta tag exists
+    let viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      viewport = document.createElement("meta");
+      viewport.setAttribute("name", "viewport");
+      viewport.setAttribute("content", "width=device-width, initial-scale=1.0");
+      document.head.appendChild(viewport);
+    }
+
+    // Apply saved zoom level if available
+    const savedZoom = localStorage.getItem("pageZoom");
+    if (savedZoom) {
+      const zoomValue = parseInt(savedZoom.replace("%", "")) / 100;
+
+      // Set CSS variable
+      document.documentElement.style.setProperty(
+        "--page-zoom",
+        zoomValue.toString()
+      );
+
+      // Apply zoom directly (for most browsers)
+      document.documentElement.style.zoom = zoomValue.toString();
+
+      // For Firefox
+      if (navigator.userAgent.indexOf("Firefox") !== -1) {
+        document.body.style.transform = `scale(${zoomValue})`;
+        document.body.style.transformOrigin = "top left";
+        document.body.style.width = `${100 / zoomValue}%`;
+      }
+
+      // Update viewport
+      viewport.setAttribute(
+        "content",
+        `width=device-width, initial-scale=${zoomValue}`
+      );
+    }
+  }, []);
+
   const MainContent = () => {
     // Add a countdown timer for when new comments will be marked as seen
     const [countdown, setCountdown] = useState<number | null>(null);
@@ -976,7 +1083,7 @@ const App = () => {
           {/* Sort options */}
           <div className="flex items-center ml-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <button
-              onClick={() => updateSortPreference("hot")}
+              onClick={() => updateCurrentSortPreference("hot")}
               className={`px-3 py-1 text-sm rounded-l-lg transition-colors ${
                 getCurrentSortPreference() === "hot"
                   ? "bg-orange-500 text-white"
@@ -987,7 +1094,7 @@ const App = () => {
               Hot
             </button>
             <button
-              onClick={() => updateSortPreference("new")}
+              onClick={() => updateCurrentSortPreference("new")}
               className={`px-3 py-1 text-sm rounded-r-lg transition-colors ${
                 getCurrentSortPreference() === "new"
                   ? "bg-orange-500 text-white"
@@ -1129,7 +1236,7 @@ const App = () => {
 
             {/* Display the submission body if it exists */}
             {posts[selectedPostIndex].selftext && (
-              <div className="mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+              <div className="post-content mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
                 {renderMarkdown(posts[selectedPostIndex].selftext.trimStart())}
               </div>
             )}
@@ -1342,7 +1449,7 @@ const App = () => {
         {/* Mobile sort toggle */}
         <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
           <button
-            onClick={() => updateSortPreference("hot")}
+            onClick={() => updateCurrentSortPreference("hot")}
             className={`px-4 py-1 text-xs ${
               getCurrentSortPreference() === "hot"
                 ? "bg-orange-500 text-white"
@@ -1352,7 +1459,7 @@ const App = () => {
             Hot
           </button>
           <button
-            onClick={() => updateSortPreference("new")}
+            onClick={() => updateCurrentSortPreference("new")}
             className={`px-4 py-1 text-xs ${
               getCurrentSortPreference() === "new"
                 ? "bg-orange-500 text-white"
@@ -1376,6 +1483,11 @@ const App = () => {
           subreddits={defaultSubreddits}
           selectedSubreddit={subreddit}
           onSubredditSelect={handleSubredditSelect}
+          sortPreferences={sortPreferences}
+          updateSortPreference={updateSortPreference}
+          updateGlobalSortPreference={updateGlobalSortPreference}
+          fontSize={fontSize}
+          updateFontSize={updateFontSize}
         />
       </div>
 

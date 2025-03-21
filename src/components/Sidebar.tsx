@@ -1,18 +1,31 @@
 import { useState, useEffect } from "react";
+import SettingsModal from "./SettingsModal";
+import type { SortType } from "../services/redditService";
 
 interface SidebarProps {
   subreddits: string[];
   selectedSubreddit: string;
   onSubredditSelect: (subreddit: string) => void;
+  sortPreferences: Record<string, SortType>;
+  updateSortPreference: (subreddit: string, sortType: SortType) => void;
+  updateGlobalSortPreference: (sortType: SortType) => void;
+  fontSize: string;
+  updateFontSize: (size: string) => void;
 }
 
 const Sidebar = ({
   subreddits,
   selectedSubreddit,
   onSubredditSelect,
+  sortPreferences,
+  updateSortPreference,
+  updateGlobalSortPreference,
+  fontSize,
+  updateFontSize,
 }: SidebarProps) => {
   const [inputSubreddit, setInputSubreddit] = useState("");
   const [mySubreddits, setMySubreddits] = useState<string[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Load saved subreddits from localStorage on component mount
   useEffect(() => {
@@ -26,6 +39,9 @@ const Sidebar = ({
   useEffect(() => {
     if (mySubreddits.length > 0) {
       localStorage.setItem("mySubreddits", JSON.stringify(mySubreddits));
+    } else {
+      // If all custom subreddits are deleted, remove the entry from localStorage
+      localStorage.removeItem("mySubreddits");
     }
   }, [mySubreddits]);
 
@@ -37,12 +53,15 @@ const Sidebar = ({
     if (inputSubreddit.trim()) {
       const newSubreddit = inputSubreddit.trim();
       onSubredditSelect(newSubreddit);
-      
+
       // Add to mySubreddits if not already in the list
-      if (!mySubreddits.includes(newSubreddit) && !subreddits.includes(newSubreddit)) {
-        setMySubreddits(prev => [...prev, newSubreddit]);
+      if (
+        !mySubreddits.includes(newSubreddit) &&
+        !subreddits.includes(newSubreddit)
+      ) {
+        setMySubreddits((prev) => [...prev, newSubreddit]);
       }
-      
+
       setInputSubreddit("");
     }
   };
@@ -51,6 +70,18 @@ const Sidebar = ({
     if (e.key === "Enter") {
       handleFetchClick();
     }
+  };
+
+  const handleDeleteSubreddit = (subredditToDelete: string) => {
+    setMySubreddits((prev) => prev.filter((s) => s !== subredditToDelete));
+  };
+
+  const openSettings = () => {
+    setIsSettingsOpen(true);
+  };
+
+  const closeSettings = () => {
+    setIsSettingsOpen(false);
   };
 
   return (
@@ -92,8 +123,19 @@ const Sidebar = ({
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300"
             aria-label="Fetch posts"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </button>
         </div>
@@ -102,8 +144,19 @@ const Sidebar = ({
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="mb-6">
           <h2 className="text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+              />
             </svg>
             Default Subreddits
           </h2>
@@ -115,7 +168,7 @@ const Sidebar = ({
                 className={`w-full px-4 py-2 rounded-lg text-left transition-all duration-200 ${
                   selectedSubreddit === subreddit
                     ? "bg-orange-500 text-white shadow-sm"
-                    : "bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700" 
+                    : "bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
                 }`}
                 aria-label={`Select ${subreddit} subreddit`}
                 aria-pressed={selectedSubreddit === subreddit}
@@ -131,8 +184,19 @@ const Sidebar = ({
         {mySubreddits.length > 0 && (
           <div className="mb-6">
             <h2 className="text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
               </svg>
               My Subreddits
             </h2>
@@ -144,7 +208,7 @@ const Sidebar = ({
                   className={`w-full px-4 py-2 rounded-lg text-left transition-all duration-200 ${
                     selectedSubreddit === subreddit
                       ? "bg-orange-500 text-white shadow-sm"
-                      : "bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700" 
+                      : "bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
                   }`}
                   aria-label={`Select ${subreddit} subreddit`}
                   aria-pressed={selectedSubreddit === subreddit}
@@ -158,13 +222,54 @@ const Sidebar = ({
           </div>
         )}
       </div>
-      
+
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          <p>Breaddit - Reddit Reader</p>
-          <p className="mt-1">Made with ❤️</p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            <p>Breaddit - Reddit Reader</p>
+            <p className="mt-1">Made with ❤️</p>
+          </div>
+          <button
+            onClick={openSettings}
+            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Open settings"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+        mySubreddits={mySubreddits}
+        onDeleteSubreddit={handleDeleteSubreddit}
+        sortPreferences={sortPreferences}
+        updateGlobalSortPreference={updateGlobalSortPreference}
+        updateSubredditSortPreference={updateSortPreference}
+        fontSize={fontSize}
+        updateFontSize={updateFontSize}
+      />
     </aside>
   );
 };
