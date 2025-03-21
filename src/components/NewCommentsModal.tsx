@@ -115,18 +115,10 @@ const NewCommentsModal = ({
               key={`thread-${threadIndex}-${
                 thread.threadComments[thread.newCommentIndex].id
               }`}
-              className="border-b border-gray-100 dark:border-gray-700 pb-6 last:border-0"
+              className="border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0"
             >
-              {/* Comment thread heading */}
-              <div className="mb-4 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                Thread {threadIndex + 1}:
-              </div>
-
               {/* Render each comment in the thread */}
               <div className="relative space-y-3">
-                {/* Thread line connector */}
-                <div className="absolute left-[9px] top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700 z-0"></div>
-
                 {thread.threadComments.map((comment, commentIndex) => {
                   const isNewComment = commentIndex === thread.newCommentIndex;
                   const depth = commentIndex; // Depth increases with each level
