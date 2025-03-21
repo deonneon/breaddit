@@ -145,7 +145,7 @@ const NewCommentsModal = ({
                               parent
                             </span>
                           </div>
-                          <div className="text-gray-700 dark:text-gray-300 text-sm break-words prose dark:prose-invert prose-sm max-w-none">
+                          <div className="comment-body text-gray-700 dark:text-gray-300 text-sm break-words prose dark:prose-invert prose-sm max-w-none">
                             {renderMarkdown(comment.body)}
                           </div>
                         </div>
