@@ -24,7 +24,6 @@ const NewCommentsModal = ({
 }: NewCommentsModalProps) => {
   // Store found threads to prevent losing them when comments are marked as seen
   const [cachedThreads, setCachedThreads] = useState<CommentThread[]>([]);
-  const [postTitleSnapshot, setPostTitleSnapshot] = useState<string>("");
 
   // Function to find all comment threads that contain new comments
   const findNewCommentThreads = (
@@ -79,13 +78,11 @@ const NewCommentsModal = ({
     if (isOpen) {
       const threads = findNewCommentThreads(comments);
       setCachedThreads(threads);
-      setPostTitleSnapshot(postTitle);
     }
   }, [isOpen, comments, postTitle]);
 
   const displayThreads =
     cachedThreads.length > 0 ? cachedThreads : findNewCommentThreads(comments);
-  const displayTitle = postTitleSnapshot || postTitle;
 
   // If there are no threads and the modal is open, close it gracefully
   useEffect(() => {
@@ -104,10 +101,6 @@ const NewCommentsModal = ({
       {displayThreads.length > 0 ? (
         <div className="space-y-8">
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 pb-2 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-            <span>
-              Showing new comments from{" "}
-              <span className="font-semibold">{displayTitle}</span>
-            </span>
             <button
               onClick={() => onClose(true)}
               className="text-xs px-3 py-1 bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-800/40 text-orange-700 dark:text-orange-400 rounded-full transition-colors"
@@ -137,8 +130,6 @@ const NewCommentsModal = ({
                 {thread.threadComments.map((comment, commentIndex) => {
                   const isNewComment = commentIndex === thread.newCommentIndex;
                   const depth = commentIndex; // Depth increases with each level
-                  const isLastComment =
-                    commentIndex === thread.threadComments.length - 1;
 
                   return (
                     <div
@@ -147,14 +138,6 @@ const NewCommentsModal = ({
                         isNewComment ? "animate-highlight rounded-md py-1" : ""
                       }`}
                     >
-                      {/* Comment connector dot */}
-                      {!isLastComment && (
-                        <div className="absolute left-[7px] top-6 w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 z-10"></div>
-                      )}
-                      {isLastComment && (
-                        <div className="absolute left-[7px] top-6 w-4 h-4 rounded-full bg-green-100 dark:bg-green-900 border-2 border-green-500 z-10"></div>
-                      )}
-
                       {/* For comments before the new one, render a simpler version */}
                       {!isNewComment ? (
                         <div
@@ -190,35 +173,6 @@ const NewCommentsModal = ({
                   );
                 })}
               </div>
-
-              {/* Thread timeline navigation */}
-              {thread.threadComments.length > 2 && (
-                <div className="mt-4 flex items-center justify-start overflow-x-auto py-2">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mr-2">
-                    Thread:
-                  </div>
-                  <div className="flex space-x-1">
-                    {thread.threadComments.map((_, idx) => (
-                      <div
-                        key={idx}
-                        className={`
-                          h-1.5 w-6 rounded-full
-                          ${
-                            idx === thread.newCommentIndex
-                              ? "bg-green-500 dark:bg-green-500"
-                              : "bg-gray-300 dark:bg-gray-600"
-                          }
-                        `}
-                        title={
-                          idx === thread.newCommentIndex
-                            ? "New comment"
-                            : "Parent comment"
-                        }
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           ))}
         </div>

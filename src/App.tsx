@@ -1226,14 +1226,6 @@ const App = () => {
                           <span className="text-green-600 dark:text-green-400">
                             (marking as seen in {countdown}s)
                           </span>
-                          <button
-                            onClick={handleMarkAllSeen}
-                            className="ml-2 text-xs py-0.5 px-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                            aria-label="Mark all comments as seen now"
-                            title="Mark all as seen now"
-                          >
-                            Mark now
-                          </button>
                         </span>
                       )}
                     </span>
