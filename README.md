@@ -10,6 +10,26 @@ Breaddit is a modern, personalized Reddit stream application built with React, T
 - Responsive design that works on desktop and mobile
 - Dark mode support
 
+## Data Storage and Caching
+
+Breaddit uses localStorage to persist your reading history and preferences:
+
+### Thread and Comment Storage
+
+- **Read Posts**: The app tracks which posts you've read and when. Posts older than 2 days are automatically removed from storage during a daily cleanup.
+- **Seen Comments**: Comment IDs you've already viewed are stored to help identify new comments when you revisit a thread.
+- **Sort Preferences**: Your preferred sorting method (hot/new) is saved for each subreddit.
+
+### Expiration Mechanisms
+
+- **Post History**: Read posts are cleaned up if they are:
+  - Older than 2 days, or
+  - No longer visible in any of your cached subreddits (they've fallen off the front page)
+- **New Comment Indicators**: New comments are highlighted for 30 seconds before being marked as "seen"
+- **Post Cache**: Fresh post data is fetched only after the 1-minute cache duration expires to reduce API calls
+
+This design keeps localStorage clean while maintaining your recent browsing history.
+
 ## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Tailwind CSS
@@ -28,12 +48,14 @@ Breaddit is a modern, personalized Reddit stream application built with React, T
 ### Installation
 
 1. Clone the repository
+
    ```
    git clone https://github.com/yourusername/breaddit.git
    cd breaddit
    ```
 
 2. Install dependencies
+
    ```
    npm install
    ```
