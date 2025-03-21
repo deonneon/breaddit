@@ -9,6 +9,7 @@ import type {
 import Sidebar from "./components/Sidebar";
 import Comment from "./components/Comment";
 import LoadingSpinner from "./components/LoadingSpinner";
+import NewCommentsModal from "./components/NewCommentsModal";
 import { renderMarkdown } from "./utils/markdownUtils";
 
 const formatDate = (timestamp: number): string => {
@@ -771,6 +772,29 @@ const App = () => {
   const MainContent = () => {
     // Add a countdown timer for when new comments will be marked as seen
     const [countdown, setCountdown] = useState<number | null>(null);
+    // Add state for new comments modal
+    const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
+
+    // Function to manually mark all comments as seen immediately
+    const handleMarkAllSeen = () => {
+      const postPermalink = posts[selectedPostIndex]?.permalink;
+      if (postPermalink && seenComments[postPermalink]) {
+        // Get all comment IDs from the current post
+        const allCommentIds = collectCommentIds(
+          posts[selectedPostIndex].comments
+        );
+        // Update seen comments immediately
+        setSeenComments((prev) => ({
+          ...prev,
+          [postPermalink]: {
+            commentIds: allCommentIds,
+            lastFetchTime: Date.now(),
+          },
+        }));
+        // Reset the countdown
+        setCountdown(null);
+      }
+    };
 
     // Get the count of new comments for the selected post - only execute if posts are loaded
     const countNewComments = useCallback(() => {
@@ -821,7 +845,8 @@ const App = () => {
           postPermalink && seenComments[postPermalink]?.commentIds?.length > 0
         );
 
-        if (!isFirstTimeSeenPost) {
+        // Don't start countdown if modal is open
+        if (!isFirstTimeSeenPost && !showNewCommentsModal) {
           setCountdown(30); // 30 seconds
 
           const timer = setInterval(() => {
@@ -835,6 +860,9 @@ const App = () => {
           }, 1000);
 
           return () => clearInterval(timer);
+        } else if (showNewCommentsModal) {
+          // Pause the countdown while modal is open
+          setCountdown((prev) => prev || 30);
         }
       } else {
         setCountdown(null);
@@ -843,7 +871,38 @@ const App = () => {
       newCommentsCount,
       posts.length > 0 ? posts[selectedPostIndex]?.permalink : null,
       seenComments,
+      showNewCommentsModal, // Add dependency on modal state
     ]);
+
+    // Handle opening the new comments modal
+    const handleOpenNewCommentsModal = (e: React.MouseEvent) => {
+      e.stopPropagation(); // Prevent event from bubbling up
+      if (newCommentsCount > 0) {
+        setShowNewCommentsModal(true);
+      }
+    };
+
+    // Handle closing the new comments modal
+    const handleCloseNewCommentsModal = (markAsSeen = false) => {
+      setShowNewCommentsModal(false);
+
+      // Mark all comments as seen if requested
+      if (markAsSeen) {
+        handleMarkAllSeen();
+      } else {
+        // Just resume countdown when modal closes without marking
+        if (newCommentsCount > 0) {
+          const postPermalink = posts[selectedPostIndex]?.permalink;
+          const isFirstTimeSeenPost = !(
+            postPermalink && seenComments[postPermalink]?.commentIds?.length > 0
+          );
+
+          if (!isFirstTimeSeenPost) {
+            setCountdown(30);
+          }
+        }
+      }
+    };
 
     if (loading) {
       return (
@@ -1141,18 +1200,40 @@ const App = () => {
                   </svg>
                   <span>Comments</span>
                   {newCommentsCount > 0 && (
-                    <span className="ml-2 text-xs font-medium text-green-600 dark:text-green-400 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30">
+                    <button
+                      onClick={handleOpenNewCommentsModal}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setShowNewCommentsModal(true);
+                        }
+                      }}
+                      className="ml-2 text-xs font-medium text-green-600 dark:text-green-400 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-800/40 transition-colors flex items-center cursor-pointer"
+                      aria-label={`View ${newCommentsCount} new comments`}
+                      tabIndex={0}
+                    >
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span>
                       {newCommentsCount} new
-                    </span>
+                    </button>
                   )}
                 </div>
                 <div className="flex items-center">
                   {lastFetchTime && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">
-                      Last updated: {lastFetchTime}
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mr-2 flex items-center">
+                      <span>Last updated: {lastFetchTime}</span>
                       {countdown !== null && (
-                        <span className="ml-2 text-green-600 dark:text-green-400">
-                          (marking as seen in {countdown}s)
+                        <span className="ml-2 flex items-center">
+                          <span className="text-green-600 dark:text-green-400">
+                            (marking as seen in {countdown}s)
+                          </span>
+                          <button
+                            onClick={handleMarkAllSeen}
+                            className="ml-2 text-xs py-0.5 px-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                            aria-label="Mark all comments as seen now"
+                            title="Mark all as seen now"
+                          >
+                            Mark now
+                          </button>
                         </span>
                       )}
                     </span>
@@ -1197,6 +1278,14 @@ const App = () => {
             </div>
           </div>
         </div>
+
+        {/* New Comments Modal */}
+        <NewCommentsModal
+          isOpen={showNewCommentsModal}
+          onClose={handleCloseNewCommentsModal}
+          comments={posts[selectedPostIndex]?.comments || []}
+          postTitle={posts[selectedPostIndex]?.title || ""}
+        />
       </div>
     );
   };
