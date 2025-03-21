@@ -4,6 +4,7 @@ type RedditComment = {
   created_utc: number;
   body: string;
   replies?: RedditComment[];
+  isNew?: boolean;
 };
 
 type RedditPost = {
@@ -23,36 +24,36 @@ type RedditPost = {
 };
 
 // Define valid sort types
-type SortType = 'hot' | 'new';
+type SortType = "hot" | "new";
 
 // For same-domain deployment, we can use a relative URL
 // In development, we'll use the full URL from the environment variable
-const API_BASE_URL = import.meta.env.DEV 
-  ? (import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api")
+const API_BASE_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api"
   : "/api"; // In production, use relative path
 
 const fetchSubredditPosts = async (
   subreddit: string,
   limit?: number,
-  sort: SortType = 'hot'
+  sort: SortType = "hot"
 ): Promise<RedditPost[]> => {
   try {
     // Fix URL construction to work with both absolute and relative paths
-    let urlString = `${API_BASE_URL}/posts/${subreddit}`;
-    
+    const urlString = `${API_BASE_URL}/posts/${subreddit}`;
+
     // If it's a relative URL (starts with /), prepend the current origin
-    const url = urlString.startsWith('/') 
+    const url = urlString.startsWith("/")
       ? new URL(urlString, window.location.origin)
       : new URL(urlString);
-    
+
     // Add limit parameter if provided
     if (limit) {
-      url.searchParams.append('limit', limit.toString());
+      url.searchParams.append("limit", limit.toString());
     }
-    
+
     // Add sort parameter
-    url.searchParams.append('sort', sort);
-    
+    url.searchParams.append("sort", sort);
+
     const response = await fetch(url.toString(), {
       headers: {
         "Content-Type": "application/json",
