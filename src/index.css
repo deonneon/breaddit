@@ -11,7 +11,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   --transition-speed: 0.3s;
-  --comment-font-size: 1rem;
+  --comment-font-size: 0.875rem;
   --post-content-font-size: 1rem;
   --page-zoom: 1;
 }
@@ -139,18 +139,18 @@ a {
 
 /* Font size classes */
 .text-size-small {
-  --comment-font-size: 0.875rem;
-  --post-content-font-size: 0.9375rem;
+  --comment-font-size: 0.75rem;
+  --post-content-font-size: 0.875rem;
 }
 
 .text-size-medium {
-  --comment-font-size: 1rem;
-  --post-content-font-size: 1.0625rem;
+  --comment-font-size: 0.875rem;
+  --post-content-font-size: 1rem;
 }
 
 .text-size-large {
-  --comment-font-size: 1.125rem;
-  --post-content-font-size: 1.1875rem;
+  --comment-font-size: 1rem;
+  --post-content-font-size: 1.125rem;
 }
 
 /* Apply these variables in the appropriate places */
