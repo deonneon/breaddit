@@ -141,7 +141,7 @@ const MainContent: FC<MainContentProps> = ({
 
   // For 2xl screens, we'll display a different layout with a traditional sidebar
   return (
-    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900">
+    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
       <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-screen 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
         {/* Subreddit title and refresh button */}
@@ -226,7 +226,7 @@ const MainContent: FC<MainContentProps> = ({
       {/* For mobile and other screens: Regular post grid view */}
       <div
         ref={scrollContainerRef}
-        className="w-full 2xl:hidden p-4 md:p-8 overflow-y-auto overflow-x-hidden h-full"
+        className="w-full 2xl:hidden p-4 md:p-8 overflow-y-auto overflow-x-hidden h-[calc(100vh-4rem)] md:h-full min-h-0 flex-1"
       >
         {/* Intersection observer marker at the top */}
         <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
@@ -290,7 +290,7 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For 2xl screens: Right scrollable post detail content */}
-      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-screen 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-8">
+      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-screen 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
         {selectedPostIndex < posts.length && (
           <PostDetail
             post={posts[selectedPostIndex]}

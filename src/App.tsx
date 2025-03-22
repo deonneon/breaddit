@@ -102,7 +102,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 overflow-hidden overflow-x-hidden flex flex-col">
+      <main className="flex-1 overflow-hidden overflow-x-hidden flex flex-col h-screen md:h-screen">
         <MainContent
           posts={posts}
           loading={loading}

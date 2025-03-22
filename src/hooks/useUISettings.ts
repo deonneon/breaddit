@@ -13,7 +13,7 @@ export const useUISettings = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // State to track if we should show the scroll to top button
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(true);
 
   // Function to update font size
   const updateFontSize = useCallback((size: FontSize) => {
