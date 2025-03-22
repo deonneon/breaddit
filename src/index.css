@@ -14,13 +14,24 @@
   --comment-font-size: 1rem;
   --post-content-font-size: 1rem;
   --page-zoom: 1;
+  --vh: 1vh; /* Default value, will be updated via JS */
+  --app-header-height: 64px; /* Default value, will be updated via JS */
 }
 
 /* Default is dark mode */
 body {
   min-height: 100vh;
+  /* Also use the CSS variable for mobile browsers */
+  min-height: calc(var(--vh, 1vh) * 100);
   transition: background-color var(--transition-speed),
     color var(--transition-speed);
+  overscroll-behavior: none; /* Prevent pull-to-refresh on mobile */
+}
+
+/* Mobile height utility class for containers that need full viewport height */
+.mobile-height {
+  height: calc(var(--vh, 1vh) * 100);
+  max-height: calc(var(--vh, 1vh) * 100 - var(--app-header-height, 64px));
 }
 
 /* For browsers that support CSS zoom but not the zoom property directly */

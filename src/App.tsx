@@ -97,7 +97,8 @@ const App = () => {
       {/* Overlay to close sidebar when clicking outside on mobile */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 top-16 z-10 bg-black/50 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-10 bg-black/50 backdrop-blur-sm"
+          style={{ top: 'var(--app-header-height, 64px)' }}
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />

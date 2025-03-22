@@ -43,6 +43,26 @@ const MainContent: FC<MainContentProps> = ({
   // Create a ref for an element at the top of the page (for intersection observer)
   const topMarkerRef = useRef<HTMLDivElement>(null);
 
+  // Update CSS variable for viewport height to handle mobile browsers
+  useEffect(() => {
+    const updateHeight = () => {
+      // Set a CSS variable with the viewport height
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
+
+    // Initial update
+    updateHeight();
+
+    // Update on resize and orientation change
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('orientationchange', updateHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('orientationchange', updateHeight);
+    };
+  }, []);
+
   // Use IntersectionObserver to detect when we've scrolled past the top
   useEffect(() => {
     // Only set up on mobile
@@ -144,7 +164,7 @@ const MainContent: FC<MainContentProps> = ({
   return (
     <div 
       ref={scrollContainerRef}
-      className="w-full p-4 md:p-8 overflow-y-auto h-full bg-gray-50 dark:bg-gray-900"
+      className="w-full p-4 md:p-8 overflow-y-auto h-full bg-gray-50 dark:bg-gray-900 mobile-height"
     >
       {/* Intersection observer marker at the top */}
       <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
