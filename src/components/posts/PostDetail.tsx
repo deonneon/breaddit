@@ -70,6 +70,10 @@ const PostDetail: FC<PostDetailProps> = ({
           setCountdown((prev) => {
             if (prev === null || prev <= 1) {
               clearInterval(timer);
+              // Call handleMarkAllSeen when countdown completes
+              if (prev !== null && prev <= 1) {
+                handleMarkAllSeen();
+              }
               return null;
             }
             return prev - 1;
@@ -79,7 +83,7 @@ const PostDetail: FC<PostDetailProps> = ({
         return () => clearInterval(timer);
       } else if (showNewCommentsModal) {
         // Pause the countdown while modal is open
-        setCountdown((prev) => prev || 30);
+        setCountdown((prev) => prev || 60);
       }
     } else {
       setCountdown(null);
@@ -114,7 +118,7 @@ const PostDetail: FC<PostDetailProps> = ({
         );
 
         if (!isFirstTimeSeenPost) {
-          setCountdown(30);
+          setCountdown(60);
         }
       }
     }
