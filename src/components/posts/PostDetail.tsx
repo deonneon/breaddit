@@ -127,7 +127,7 @@ const PostDetail: FC<PostDetailProps> = ({
   return (
     <div 
       key={post.permalink}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden"
     >
       <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center">
         {post.title}
@@ -219,14 +219,14 @@ const PostDetail: FC<PostDetailProps> = ({
               </a>
             </div>
           ) : (
-            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex justify-center">
+            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex justify-center overflow-hidden">
               <img
                 src={
                   post.url_overridden_by_dest ||
                   post.url
                 }
                 alt={post.title}
-                className="max-w-full h-auto rounded-md"
+                className="max-w-full h-auto rounded-md object-contain"
                 loading="lazy"
                 onError={(e) => {
                   // If image fails to load, show a link instead

@@ -60,7 +60,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden overflow-x-hidden relative`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
@@ -102,7 +102,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 overflow-hidden flex flex-col">
+      <main className="flex-1 overflow-hidden overflow-x-hidden flex flex-col h-screen md:h-screen">
         <MainContent
           posts={posts}
           loading={loading}
