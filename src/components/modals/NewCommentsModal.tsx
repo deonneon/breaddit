@@ -140,7 +140,7 @@ const NewCommentsModal = ({
                           <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-between font-medium">
                               {comment.author}
                           </div>
-                          <div className="comment-body text-gray-700 dark:text-gray-300 text-sm break-words prose dark:prose-invert prose-sm max-w-none">
+                          <div className="comment-body text-gray-700 dark:text-gray-300 break-words prose dark:prose-invert max-w-none">
                             {renderMarkdown(comment.body)}
                           </div>
                         </div>

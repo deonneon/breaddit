@@ -206,7 +206,7 @@ const PostDetail: FC<PostDetailProps> = ({
 
       {/* Display the submission body if it exists */}
       {post.selftext && (
-        <div className="post-content mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+        <div className="post-content mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 prose dark:prose-invert">
           {renderMarkdown(post.selftext.trimStart())}
         </div>
       )}

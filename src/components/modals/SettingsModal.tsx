@@ -153,7 +153,7 @@ const SettingsModal = ({
           </div>
 
           {/* Font size preview */}
-          <div className="mt-4 border rounded-lg border-gray-200 dark:border-gray-700 p-4">
+          <div className={`mt-4 border rounded-lg border-gray-200 dark:border-gray-700 p-4 text-size-${selectedFontSize}`}>
             <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Preview:
             </h4>
@@ -171,15 +171,7 @@ const SettingsModal = ({
                     </span>
                   </div>
                   <div
-                    className={`comment-body prose dark:prose-invert prose-sm break-words`}
-                    style={{
-                      fontSize:
-                        selectedFontSize === "small"
-                          ? "0.875rem"
-                          : selectedFontSize === "medium"
-                          ? "1rem"
-                          : "1.125rem",
-                    }}
+                    className={`comment-body prose dark:prose-invert break-words`}
                   >
                     {renderMarkdown(
                       "This is how **comments** will appear with " +
@@ -197,15 +189,7 @@ const SettingsModal = ({
                 </p>
                 <div className="p-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                   <div
-                    className={`post-content prose dark:prose-invert prose-sm break-words`}
-                    style={{
-                      fontSize:
-                        selectedFontSize === "small"
-                          ? "0.9375rem"
-                          : selectedFontSize === "medium"
-                          ? "1.0625rem"
-                          : "1.1875rem",
-                    }}
+                    className={`post-content prose dark:prose-invert break-words`}
                   >
                     {renderMarkdown(
                       "## Post Content Preview\n\nThis is how **post content** will appear with " +
