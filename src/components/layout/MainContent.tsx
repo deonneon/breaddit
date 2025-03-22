@@ -142,7 +142,7 @@ const MainContent: FC<MainContentProps> = ({
   return (
     <div 
       ref={scrollContainerRef}
-      className="w-full p-4 md:p-8 overflow-y-auto h-full bg-gray-50 dark:bg-gray-900"
+      className="w-full p-4 md:p-8 overflow-y-auto overflow-x-hidden h-full bg-gray-50 dark:bg-gray-900"
     >
       {/* Intersection observer marker at the top */}
       <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
@@ -176,7 +176,7 @@ const MainContent: FC<MainContentProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 3xl:grid-cols-8 gap-3 mb-6 w-full">
         {posts.map((post, index) => (
           <PostCard
             key={post.permalink}
@@ -191,7 +191,7 @@ const MainContent: FC<MainContentProps> = ({
         ))}
       </div>
 
-      <div className="space-y-8 pb-16 max-w-4xl mx-auto">
+      <div className="space-y-8 pb-16 w-full">
         {selectedPostIndex < posts.length && (
           <PostDetail
             post={posts[selectedPostIndex]}
