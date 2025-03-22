@@ -331,74 +331,6 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     checkForNewComments,
   ]);
 
-  // Function to refresh just the comments for the current post
-  const refreshComments = useCallback(async () => {
-    if (!posts[selectedPostIndex]) return;
-
-    try {
-      // Get the current post's permalink and subreddit
-      const currentPost = posts[selectedPostIndex];
-      const postPermalink = currentPost.permalink;
-
-      // Set loading state for comments only
-      const tempPost = { ...currentPost, comments: [] };
-      const updatedPosts = [...posts];
-      updatedPosts[selectedPostIndex] = tempPost;
-      setPosts(updatedPosts);
-
-      // Fetch fresh data for the current subreddit to get updated comments
-      const currentSort = getCurrentSortPreference();
-      const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || 4;
-      const freshData = await fetchSubredditPosts(subreddit, postLimit, currentSort);
-
-      // Find the matching post in the fresh data
-      const freshPost = freshData.find((post) => post.permalink === postPermalink);
-
-      if (freshPost) {
-        // Process the comments to mark new ones
-        const now = Date.now();
-        const processedComments = markNewComments(freshPost.comments, postPermalink);
-
-        // Update only the comments of the current post
-        const updatedPost = {
-          ...currentPost,
-          comments: processedComments,
-        };
-
-        const updatedPostsWithComments = [...posts];
-        updatedPostsWithComments[selectedPostIndex] = updatedPost;
-        setPosts(updatedPostsWithComments);
-
-        // Update the cache as well
-        setCachedPosts((prev) => {
-          const cachedSubredditPosts = prev[subreddit]?.posts || [];
-          const updatedCachedPosts = cachedSubredditPosts.map((post) =>
-            post.permalink === postPermalink ? updatedPost : post
-          );
-
-          return {
-            ...prev,
-            [subreddit]: {
-              posts: updatedCachedPosts,
-              timestamp: prev[subreddit]?.timestamp || now,
-            },
-          };
-        });
-      }
-    } catch (error) {
-      console.error("Error refreshing comments:", error);
-      // If there's an error, fetch the entire post data again
-      refreshPosts();
-    }
-  }, [
-    posts,
-    selectedPostIndex,
-    subreddit,
-    getCurrentSortPreference,
-    markNewComments,
-    collectCommentIds,
-    refreshPosts,
-  ]);
 
   // Fetch posts when subreddit changes
   useEffect(() => {
@@ -422,6 +354,5 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     updateCurrentSortPreference,
     sortPreferences,
     refreshPosts,
-    refreshComments,
   };
 }; 
