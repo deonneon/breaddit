@@ -1,37 +1,11 @@
-import { RedditComment } from "../services/redditService";
-import { renderMarkdown } from "../utils/markdownUtils";
+import { RedditComment } from "../../services/redditService";
+import { renderMarkdown } from "../../utils/markdownUtils";
+import { formatDate } from "../../utils/formatters";
 
 type CommentProps = {
   comment: RedditComment;
   depth: number;
   timestamp: number;
-};
-
-const formatDate = (timestamp: number): string => {
-  const commentDate = new Date(timestamp * 1000);
-  const today = new Date();
-
-  // Check if the comment was posted today
-  const isToday =
-    commentDate.getDate() === today.getDate() &&
-    commentDate.getMonth() === today.getMonth() &&
-    commentDate.getFullYear() === today.getFullYear();
-
-  if (isToday) {
-    // For comments posted today, only show hours and minutes
-    return commentDate.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } else {
-    // For older comments, show the full date
-    return commentDate.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
 };
 
 const Comment = ({ comment, depth, timestamp }: CommentProps) => {
@@ -93,7 +67,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
           )}
         </div>
         <div
-          className={`comment-body text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full prose dark:prose-invert prose-sm md:prose-base prose-orange ${
+          className={`comment-body text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full prose dark:prose-invert prose-orange ${
             depth === 0 ? "ml-4" : ""
           }`}
         >

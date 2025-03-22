@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
-import Comment from "./Comment";
-import type { RedditComment } from "../services/redditService";
-import { renderMarkdown } from "../utils/markdownUtils";
+import Comment from "../posts/Comment";
+import type { RedditComment } from "../../services/redditService";
+import { renderMarkdown } from "../../utils/markdownUtils";
 
 type NewCommentsModalProps = {
   isOpen: boolean;
@@ -115,7 +115,7 @@ const NewCommentsModal = ({
               key={`thread-${threadIndex}-${
                 thread.threadComments[thread.newCommentIndex].id
               }`}
-              className="border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0"
+              className="border-b border-gray-100 dark:border-gray-700 pb-1 last:border-0"
             >
               {/* Render each comment in the thread */}
               <div className="relative space-y-3">
@@ -135,17 +135,12 @@ const NewCommentsModal = ({
                         <div
                           className={`${getIndentClass(
                             depth
-                          )} pl-4 border-l-2 border-gray-300 dark:border-gray-600 pb-2`}
+                          )} pl-4 border-l-2 border-gray-300 dark:border-gray-600 pb-1`}
                         >
-                          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-between">
-                            <span className="font-medium">
+                          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-between font-medium">
                               {comment.author}
-                            </span>
-                            <span className="text-xs px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
-                              parent
-                            </span>
                           </div>
-                          <div className="comment-body text-gray-700 dark:text-gray-300 text-sm break-words prose dark:prose-invert prose-sm max-w-none">
+                          <div className="comment-body text-gray-700 dark:text-gray-300 break-words prose dark:prose-invert max-w-none">
                             {renderMarkdown(comment.body)}
                           </div>
                         </div>

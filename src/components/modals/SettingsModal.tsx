@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
-import type { SortType } from "../services/redditService";
-import { renderMarkdown } from "../utils/markdownUtils";
+import type { SortType } from "../../services/redditService";
+import { renderMarkdown } from "../../utils/markdownUtils";
+import type { FontSize } from "../../hooks/useUISettings";
 
 type SettingsModalProps = {
   isOpen: boolean;
@@ -14,8 +15,8 @@ type SettingsModalProps = {
     subreddit: string,
     sortType: SortType
   ) => void;
-  fontSize: string;
-  updateFontSize: (size: string) => void;
+  fontSize: FontSize;
+  updateFontSize: (size: FontSize) => void;
 };
 
 const SettingsModal = ({
@@ -64,7 +65,7 @@ const SettingsModal = ({
   };
 
   // Handle font size change
-  const handleFontSizeChange = (size: string) => {
+  const handleFontSizeChange = (size: FontSize) => {
     setSelectedFontSize(size);
     updateFontSize(size);
   };
@@ -152,7 +153,7 @@ const SettingsModal = ({
           </div>
 
           {/* Font size preview */}
-          <div className="mt-4 border rounded-lg border-gray-200 dark:border-gray-700 p-4">
+          <div className={`mt-4 border rounded-lg border-gray-200 dark:border-gray-700 p-4 text-size-${selectedFontSize}`}>
             <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Preview:
             </h4>
@@ -170,15 +171,7 @@ const SettingsModal = ({
                     </span>
                   </div>
                   <div
-                    className={`comment-body prose dark:prose-invert prose-sm break-words`}
-                    style={{
-                      fontSize:
-                        selectedFontSize === "small"
-                          ? "0.875rem"
-                          : selectedFontSize === "medium"
-                          ? "1rem"
-                          : "1.125rem",
-                    }}
+                    className={`comment-body prose dark:prose-invert break-words`}
                   >
                     {renderMarkdown(
                       "This is how **comments** will appear with " +
@@ -196,15 +189,7 @@ const SettingsModal = ({
                 </p>
                 <div className="p-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                   <div
-                    className={`post-content prose dark:prose-invert prose-sm break-words`}
-                    style={{
-                      fontSize:
-                        selectedFontSize === "small"
-                          ? "0.9375rem"
-                          : selectedFontSize === "medium"
-                          ? "1.0625rem"
-                          : "1.1875rem",
-                    }}
+                    className={`post-content prose dark:prose-invert break-words`}
                   >
                     {renderMarkdown(
                       "## Post Content Preview\n\nThis is how **post content** will appear with " +
@@ -278,6 +263,7 @@ const SettingsModal = ({
           </p>
         </div>
 
+        {/* Global Sort Preference */}
         <div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
             Default Sort Preference
@@ -290,7 +276,6 @@ const SettingsModal = ({
                   ? "bg-orange-500 text-white"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               }`}
-              aria-label="Set default sort to hot"
             >
               Hot
             </button>
@@ -301,93 +286,60 @@ const SettingsModal = ({
                   ? "bg-orange-500 text-white"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               }`}
-              aria-label="Set default sort to new"
             >
               New
             </button>
           </div>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            This setting applies to all subreddits without a specific
-            preference.
-          </p>
         </div>
-
+        
+        {/* Subreddit-specific Sort Preferences */}
         {mySubreddits.length > 0 && (
           <div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-              My Subreddits
+              Subreddit Sort Preferences
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
               {mySubreddits.map((subreddit) => (
-                <div
-                  key={subreddit}
-                  className="flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
-                >
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                <div key={subreddit} className="flex items-center justify-between">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
                     r/{subreddit}
                   </span>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
                       <button
-                        onClick={() =>
-                          handleSubredditSortChange(subreddit, "hot")
-                        }
+                        onClick={() => handleSubredditSortChange(subreddit, "hot")}
                         className={`px-3 py-1 text-xs ${
                           sortPreferences[subreddit] === "hot"
                             ? "bg-orange-500 text-white"
-                            : "text-gray-700 dark:text-gray-300"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                         }`}
-                        aria-label={`Set ${subreddit} sort to hot`}
                       >
                         Hot
                       </button>
                       <button
-                        onClick={() =>
-                          handleSubredditSortChange(subreddit, "new")
-                        }
+                        onClick={() => handleSubredditSortChange(subreddit, "new")}
                         className={`px-3 py-1 text-xs ${
                           sortPreferences[subreddit] === "new"
                             ? "bg-orange-500 text-white"
-                            : "text-gray-700 dark:text-gray-300"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                         }`}
-                        aria-label={`Set ${subreddit} sort to new`}
                       >
                         New
                       </button>
                     </div>
                     <button
                       onClick={() => onDeleteSubreddit(subreddit)}
-                      className="p-1.5 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors"
-                      aria-label={`Delete ${subreddit}`}
+                      className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
+                      aria-label={`Delete ${subreddit} subreddit`}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {mySubreddits.length === 0 && (
-          <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-            <p>No custom subreddits added yet.</p>
-            <p className="mt-1 text-sm">
-              Search for subreddits to add them to your list.
-            </p>
           </div>
         )}
       </div>

@@ -155,9 +155,14 @@ a {
 
 /* Apply these variables in the appropriate places */
 .comment-body {
-  font-size: var(--comment-font-size);
+  font-size: var(--comment-font-size) !important;
 }
 
 .post-content {
-  font-size: var(--post-content-font-size);
+  font-size: var(--post-content-font-size) !important;
+}
+
+/* Ensure Tailwind prose classes don't override our font size */
+.prose.comment-body *, .prose.post-content * {
+  font-size: inherit;
 }

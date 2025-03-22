@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import SettingsModal from "./SettingsModal";
-import type { SortType } from "../services/redditService";
+import SettingsModal from "../modals/SettingsModal";
+import type { SortType } from "../../services/redditService";
+import type { FontSize } from "../../hooks/useUISettings";
 
 interface SidebarProps {
   subreddits: string[];
@@ -9,8 +10,8 @@ interface SidebarProps {
   sortPreferences: Record<string, SortType>;
   updateSortPreference: (subreddit: string, sortType: SortType) => void;
   updateGlobalSortPreference: (sortType: SortType) => void;
-  fontSize: string;
-  updateFontSize: (size: string) => void;
+  fontSize: FontSize;
+  updateFontSize: (size: FontSize) => void;
 }
 
 const Sidebar = ({
