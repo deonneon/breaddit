@@ -61,7 +61,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden w-full max-w-full`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader

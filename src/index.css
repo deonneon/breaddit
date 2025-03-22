@@ -26,6 +26,9 @@ body {
   transition: background-color var(--transition-speed),
     color var(--transition-speed);
   overscroll-behavior: none; /* Prevent pull-to-refresh on mobile */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  position: relative; /* Ensure overflow containment works properly */
+  width: 100%;
 }
 
 /* Mobile height utility class for containers that need full viewport height */
@@ -176,4 +179,29 @@ a {
 /* Ensure Tailwind prose classes don't override our font size */
 .prose.comment-body *, .prose.post-content * {
   font-size: inherit;
+}
+
+/* Mobile touch behavior fixes */
+@media (max-width: 768px) {
+  html, body, #root {
+    touch-action: pan-y; /* Only allow vertical scrolling on mobile */
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Fix for iOS Safari and other mobile browsers */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* For browsers that support CSS zoom but not the zoom property directly */
+@supports not (zoom: 1) {
+  body {
+    transform: scale(var(--page-zoom));
+    transform-origin: top left;
+    width: calc(100% / var(--page-zoom));
+    height: auto;
+  }
 }
