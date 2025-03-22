@@ -50,7 +50,6 @@ const App = () => {
     updateCurrentSortPreference,
     sortPreferences,
     refreshPosts,
-    refreshComments,
   } = useSubredditPosts("thewallstreet");
 
   const handleSubredditSelect = (selectedSubreddit: string) => {
@@ -115,7 +114,6 @@ const App = () => {
           readPosts={readPosts}
           markPostAsRead={markPostAsRead}
           refreshPosts={refreshPosts}
-          refreshComments={refreshComments}
           seenComments={seenComments}
           markAllCommentsAsSeen={markAllCommentsAsSeen}
           showScrollTop={showScrollTop}

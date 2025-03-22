@@ -15,7 +15,6 @@ interface MainContentProps {
   readPosts: Record<string, number>;
   markPostAsRead: (postId: string) => void;
   refreshPosts: () => void;
-  refreshComments: () => void;
   seenComments: any;
   markAllCommentsAsSeen: any;
   showScrollTop: boolean;
@@ -32,7 +31,6 @@ const MainContent: FC<MainContentProps> = ({
   readPosts,
   markPostAsRead,
   refreshPosts,
-  refreshComments,
   seenComments,
   markAllCommentsAsSeen,
   showScrollTop,
@@ -217,7 +215,6 @@ const MainContent: FC<MainContentProps> = ({
         {selectedPostIndex < posts.length && (
           <PostDetail
             post={posts[selectedPostIndex]}
-            refreshComments={refreshComments}
             seenComments={seenComments}
             markAllCommentsAsSeen={markAllCommentsAsSeen}
           />

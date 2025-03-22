@@ -7,7 +7,6 @@ import NewCommentsModal from '../modals/NewCommentsModal';
 
 interface PostDetailProps {
   post: RedditPost;
-  refreshComments: () => void;
   seenComments: {
     [postPermalink: string]: {
       commentIds: string[];
@@ -19,7 +18,6 @@ interface PostDetailProps {
 
 const PostDetail: FC<PostDetailProps> = ({ 
   post, 
-  refreshComments, 
   seenComments,
   markAllCommentsAsSeen
 }) => {
@@ -297,7 +295,6 @@ const PostDetail: FC<PostDetailProps> = ({
           <div className="flex items-center">
             {lastFetchTime && (
               <span className="text-xs text-gray-500 dark:text-gray-400 mr-2 flex items-center">
-                <span>Last updated: {lastFetchTime}</span>
                 {countdown !== null && (
                   <span className="ml-2 flex items-center">
                     <span className="text-green-600 dark:text-green-400">
@@ -307,27 +304,6 @@ const PostDetail: FC<PostDetailProps> = ({
                 )}
               </span>
             )}
-            <button
-              onClick={refreshComments}
-              className="p-1.5 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:rotate-180 duration-500"
-              aria-label="Refresh comments"
-              title="Refresh comments"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            </button>
           </div>
         </h3>
         {post.comments.length > 0 ? (
