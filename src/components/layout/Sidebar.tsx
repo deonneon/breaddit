@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import SettingsModal from "../SettingsModal";
+import SettingsModal from "../modals/SettingsModal";
 import type { SortType } from "../../services/redditService";
 import type { FontSize } from "../../hooks/useUISettings";
 

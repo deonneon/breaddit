@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
-import type { SortType } from "../services/redditService";
-import { renderMarkdown } from "../utils/markdownUtils";
-import type { FontSize } from "../hooks/useUISettings";
+import type { SortType } from "../../services/redditService";
+import { renderMarkdown } from "../../utils/markdownUtils";
+import type { FontSize } from "../../hooks/useUISettings";
 
 type SettingsModalProps = {
   isOpen: boolean;
@@ -303,16 +303,6 @@ const SettingsModal = ({
               }`}
             >
               New
-            </button>
-            <button
-              onClick={() => handleGlobalSortChange("top")}
-              className={`px-4 py-2 text-sm ${
-                defaultSort === "top"
-                  ? "bg-orange-500 text-white"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              }`}
-            >
-              Top
             </button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { FC, useRef, useEffect } from 'react';
 import PostCard from '../posts/PostCard';
 import PostDetail from '../posts/PostDetail';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../ui/LoadingSpinner';
 import ScrollToTop from '../ui/ScrollToTop';
 import type { RedditPost } from '../../services/redditService';
 

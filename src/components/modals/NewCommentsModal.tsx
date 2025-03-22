@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
-import Comment from "./Comment";
-import type { RedditComment } from "../services/redditService";
-import { renderMarkdown } from "../utils/markdownUtils";
+import Comment from "../posts/Comment";
+import type { RedditComment } from "../../services/redditService";
+import { renderMarkdown } from "../../utils/markdownUtils";
 
 type NewCommentsModalProps = {
   isOpen: boolean;

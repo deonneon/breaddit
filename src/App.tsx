@@ -63,23 +63,25 @@ const App = () => {
     <div
       className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden`}
     >
-      {/* Mobile Header with Hamburger */}
+      {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
         subreddit={subreddit}
         refreshPosts={refreshPosts}
         toggleSidebar={toggleSidebar}
         currentSort={getCurrentSortPreference()}
         updateSort={updateCurrentSortPreference}
+        sortPreferences={sortPreferences}
+        updateSortPreference={updateSortPreference}
+        updateGlobalSortPreference={updateGlobalSortPreference}
+        fontSize={fontSize as FontSize}
+        updateFontSize={updateFontSize as (size: FontSize) => void}
+        subreddits={DEFAULT_SUBREDDITS}
+        onSubredditSelect={handleSubredditSelect}
+        sidebarOpen={sidebarOpen}
       />
 
-      {/* Sidebar - hidden on mobile unless toggled */}
-      <div
-        className={`
-          ${sidebarOpen ? "block" : "hidden"} 
-          md:block fixed md:static z-20 md:h-screen h-[calc(100vh-64px)] top-16 md:top-0 w-64
-          transition-all duration-300 ease-in-out md:flex-shrink-0 shadow-lg md:shadow-none
-        `}
-      >
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden md:block md:h-screen w-64 md:flex-shrink-0">
         <Sidebar
           subreddits={DEFAULT_SUBREDDITS}
           selectedSubreddit={subreddit}

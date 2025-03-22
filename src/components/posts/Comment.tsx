@@ -1,5 +1,5 @@
-import { RedditComment } from "../services/redditService";
-import { renderMarkdown } from "../utils/markdownUtils";
+import { RedditComment } from "../../services/redditService";
+import { renderMarkdown } from "../../utils/markdownUtils";
 
 type CommentProps = {
   comment: RedditComment;

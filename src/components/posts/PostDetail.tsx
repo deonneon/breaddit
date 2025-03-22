@@ -1,9 +1,9 @@
 import { FC, useState, useCallback, useEffect } from 'react';
 import type { RedditPost, RedditComment } from '../../services/redditService';
-import Comment from '../Comment';
+import Comment from './Comment';
 import { formatDate } from '../../utils/formatters';
 import { renderMarkdown } from '../../utils/markdownUtils';
-import NewCommentsModal from '../NewCommentsModal';
+import NewCommentsModal from '../modals/NewCommentsModal';
 
 interface PostDetailProps {
   post: RedditPost;
