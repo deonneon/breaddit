@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import type { SortType } from '../../services/redditService';
 import type { FontSize } from '../../hooks/useUISettings';
 import Sidebar from './Sidebar';
@@ -35,10 +35,34 @@ const MobileHeader: FC<MobileHeaderProps> = ({
   onSubredditSelect,
   sidebarOpen
 }) => {
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  // Set CSS variable for header height
+  useEffect(() => {
+    if (headerRef.current) {
+      const headerHeight = headerRef.current.offsetHeight;
+      document.documentElement.style.setProperty('--app-header-height', `${headerHeight}px`);
+    }
+    
+    // Also handle resize events
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const headerHeight = headerRef.current.offsetHeight;
+        document.documentElement.style.setProperty('--app-header-height', `${headerHeight}px`);
+      }
+    };
+    
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  }, []);
+
   return (
     <>
       {/* Mobile Header Bar */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 shrink-0 shadow-sm">
+      <div 
+        ref={headerRef}
+        className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 shrink-0 shadow-sm"
+      >
         <div className="flex items-center">
           <button
             onClick={toggleSidebar}
@@ -119,7 +143,10 @@ const MobileHeader: FC<MobileHeaderProps> = ({
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-20 w-64 h-[calc(100vh-64px)]">
+        <div className="md:hidden fixed inset-0 top-16 z-20 w-64" style={{ 
+          top: 'var(--app-header-height, 64px)',
+          height: 'calc(var(--vh, 1vh) * 100 - var(--app-header-height, 64px))'
+        }}>
           <Sidebar
             subreddits={subreddits}
             selectedSubreddit={subreddit}

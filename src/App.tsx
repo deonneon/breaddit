@@ -50,7 +50,6 @@ const App = () => {
     updateCurrentSortPreference,
     sortPreferences,
     refreshPosts,
-    refreshComments,
   } = useSubredditPosts("thewallstreet");
 
   const handleSubredditSelect = (selectedSubreddit: string) => {
@@ -61,7 +60,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden w-full max-w-full`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
@@ -97,7 +96,8 @@ const App = () => {
       {/* Overlay to close sidebar when clicking outside on mobile */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 top-16 z-10 bg-black/50 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-10 bg-black/50 backdrop-blur-sm"
+          style={{ top: 'var(--app-header-height, 64px)' }}
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
@@ -114,7 +114,6 @@ const App = () => {
           readPosts={readPosts}
           markPostAsRead={markPostAsRead}
           refreshPosts={refreshPosts}
-          refreshComments={refreshComments}
           seenComments={seenComments}
           markAllCommentsAsSeen={markAllCommentsAsSeen}
           showScrollTop={showScrollTop}
