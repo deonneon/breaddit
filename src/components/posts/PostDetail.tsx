@@ -25,13 +25,15 @@ const PostDetail: FC<PostDetailProps> = ({
   const [countdown, setCountdown] = useState<number | null>(null);
   // Add state for new comments modal
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
+  // Track if we need to mark comments as seen
+  const [shouldMarkAsSeen, setShouldMarkAsSeen] = useState(false);
 
   // Function to manually mark all comments as seen immediately
-  const handleMarkAllSeen = () => {
+  const handleMarkAllSeen = useCallback(() => {
     markAllCommentsAsSeen(post.permalink, post.comments);
     // Reset the countdown
     setCountdown(null);
-  };
+  }, [post.permalink, post.comments, markAllCommentsAsSeen]);
 
   // Get the count of new comments for the post
   const countNewComments = useCallback(() => {
@@ -54,8 +56,18 @@ const PostDetail: FC<PostDetailProps> = ({
   // Calculate values
   const newCommentsCount = countNewComments();
 
+  // Handle marking comments as seen when timer completes
+  useEffect(() => {
+    if (shouldMarkAsSeen) {
+      handleMarkAllSeen();
+      setShouldMarkAsSeen(false);
+    }
+  }, [shouldMarkAsSeen, handleMarkAllSeen]);
+
   // Start countdown when we have new comments
   useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+
     if (newCommentsCount > 0) {
       // Only start the countdown for posts we've seen before - not for first loads
       const isFirstTimeSeenPost = !(
@@ -64,23 +76,21 @@ const PostDetail: FC<PostDetailProps> = ({
 
       // Don't start countdown if modal is open
       if (!isFirstTimeSeenPost && !showNewCommentsModal) {
-        setCountdown(30); // 30 seconds
+        setCountdown(60);
 
-        const timer = setInterval(() => {
+        timer = setInterval(() => {
           setCountdown((prev) => {
-            if (prev === null || prev <= 1) {
-              clearInterval(timer);
-              // Call handleMarkAllSeen when countdown completes
-              if (prev !== null && prev <= 1) {
-                handleMarkAllSeen();
-              }
+            // Skip if timer is already finished
+            if (prev === null) return null;
+            
+            if (prev <= 1) {
+              // Set the flag to mark comments as seen in a separate effect
+              setShouldMarkAsSeen(true);
               return null;
             }
             return prev - 1;
           });
         }, 1000);
-
-        return () => clearInterval(timer);
       } else if (showNewCommentsModal) {
         // Pause the countdown while modal is open
         setCountdown((prev) => prev || 60);
@@ -88,6 +98,11 @@ const PostDetail: FC<PostDetailProps> = ({
     } else {
       setCountdown(null);
     }
+
+    // Clean up timer on unmount or dependencies change
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [
     newCommentsCount,
     post.permalink,
