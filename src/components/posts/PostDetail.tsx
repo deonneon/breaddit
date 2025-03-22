@@ -25,17 +25,12 @@ const PostDetail: FC<PostDetailProps> = ({
   const [countdown, setCountdown] = useState<number | null>(null);
   // Add state for new comments modal
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
-  // Track if we need to mark comments as seen
-  const [shouldMarkAsSeen, setShouldMarkAsSeen] = useState(false);
-  // Track if timer is running
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   // Function to manually mark all comments as seen immediately
   const handleMarkAllSeen = useCallback(() => {
     markAllCommentsAsSeen(post.permalink, post.comments);
     // Reset the countdown
     setCountdown(null);
-    setIsTimerRunning(false);
   }, [post.permalink, post.comments, markAllCommentsAsSeen]);
 
   // Get the count of new comments for the post
@@ -59,77 +54,47 @@ const PostDetail: FC<PostDetailProps> = ({
   // Calculate values
   const newCommentsCount = countNewComments();
 
-  // Handle marking comments as seen when timer completes
-  useEffect(() => {
-    if (shouldMarkAsSeen) {
-      handleMarkAllSeen();
-      setShouldMarkAsSeen(false);
-    }
-  }, [shouldMarkAsSeen, handleMarkAllSeen]);
-
   // Start countdown when we have new comments
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
-
-    if (newCommentsCount > 0 && !isTimerRunning) {
+    if (newCommentsCount > 0) {
       // Only start the countdown for posts we've seen before - not for first loads
       const isFirstTimeSeenPost = !(
         post.permalink && seenComments[post.permalink]?.commentIds?.length > 0
       );
 
-      // Don't start countdown if modal is open or it's first time seeing post
+      // Don't start countdown if modal is open
       if (!isFirstTimeSeenPost && !showNewCommentsModal) {
-        setCountdown(60);
-        setIsTimerRunning(true);
+        setCountdown(30); // 30 seconds
 
-        timer = setInterval(() => {
+        const timer = setInterval(() => {
           setCountdown((prev) => {
-            if (prev === null) {
-              // Timer was canceled elsewhere
-              clearInterval(timer!);
-              setIsTimerRunning(false);
+            if (prev === null || prev <= 1) {
+              clearInterval(timer);
+              // Call handleMarkAllSeen when countdown completes
+              if (prev !== null && prev <= 1) {
+                handleMarkAllSeen();
+              }
               return null;
             }
-            
-            if (prev <= 1) {
-              // Time's up, mark comments as seen
-              clearInterval(timer!);
-              setIsTimerRunning(false);
-              setShouldMarkAsSeen(true);
-              return null;
-            }
-            
             return prev - 1;
           });
         }, 1000);
-      }
-    } else if (newCommentsCount === 0) {
-      // No new comments, clear any timers
-      setCountdown(null);
-      setIsTimerRunning(false);
-    }
 
-    // Clean up timer on unmount or dependencies change
-    return () => {
-      if (timer) {
-        clearInterval(timer);
+        return () => clearInterval(timer);
+      } else if (showNewCommentsModal) {
+        // Pause the countdown while modal is open
+        setCountdown((prev) => prev || 60);
       }
-    };
+    } else {
+      setCountdown(null);
+    }
   }, [
     newCommentsCount,
     post.permalink,
     seenComments,
     showNewCommentsModal,
-    isTimerRunning,
+    handleMarkAllSeen
   ]);
-
-  // Effect to pause/resume timer when modal opens/closes
-  useEffect(() => {
-    if (showNewCommentsModal) {
-      // Pause the timer when modal opens
-      setIsTimerRunning(false);
-    }
-  }, [showNewCommentsModal]);
 
   // Handle opening the new comments modal
   const handleOpenNewCommentsModal = (e: React.MouseEvent) => {
@@ -146,16 +111,16 @@ const PostDetail: FC<PostDetailProps> = ({
     // Mark all comments as seen if requested
     if (markAsSeen) {
       handleMarkAllSeen();
-    } else if (newCommentsCount > 0) {
-      // Resume countdown when modal closes without marking
-      const isFirstTimeSeenPost = !(
-        post.permalink && seenComments[post.permalink]?.commentIds?.length > 0
-      );
+    } else {
+      // Just resume countdown when modal closes without marking
+      if (newCommentsCount > 0) {
+        const isFirstTimeSeenPost = !(
+          post.permalink && seenComments[post.permalink]?.commentIds?.length > 0
+        );
 
-      if (!isFirstTimeSeenPost) {
-        // If not first time seeing post, resume timer with the remaining time or 60s
-        setCountdown((prev) => prev || 60);
-        setIsTimerRunning(true);
+        if (!isFirstTimeSeenPost) {
+          setCountdown(60);
+        }
       }
     }
   };
