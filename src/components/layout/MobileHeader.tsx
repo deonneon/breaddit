@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import type { SortType } from '../../services/redditService';
 import type { FontSize } from '../../hooks/useUISettings';
 import Sidebar from './Sidebar';
@@ -35,6 +35,23 @@ const MobileHeader: FC<MobileHeaderProps> = ({
   onSubredditSelect,
   sidebarOpen
 }) => {
+  const [sidebarHeight, setSidebarHeight] = useState<number>(0);
+
+  useEffect(() => {
+    const calculateSidebarHeight = () => {
+      const headerHeight = 64; // Adjust this if the header height changes
+      const usableHeight = window.innerHeight - headerHeight;
+      setSidebarHeight(usableHeight);
+    };
+
+    calculateSidebarHeight();
+    window.addEventListener('resize', calculateSidebarHeight);
+    
+    return () => {
+      window.removeEventListener('resize', calculateSidebarHeight);
+    };
+  }, []);
+
   return (
     <>
       {/* Mobile Header Bar */}
@@ -119,7 +136,7 @@ const MobileHeader: FC<MobileHeaderProps> = ({
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-20 w-64 h-[calc(100vh-64px)]">
+        <div className="md:hidden fixed inset-0 top-16 z-20 w-64" style={{ height: sidebarHeight }}>
           <Sidebar
             subreddits={subreddits}
             selectedSubreddit={subreddit}
