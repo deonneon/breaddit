@@ -8,10 +8,20 @@ export const useTheme = () => {
     return (localStorage.getItem('theme') as Theme) || 'system';
   });
 
+  // Function to update the theme-color meta tag
+  const updateThemeColorMeta = (isDark: boolean) => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', isDark ? '#1f2937' : '#ffffff');
+    }
+  };
+
   // Function to handle system theme changes
   const handleSystemThemeChange = (mediaQuery: MediaQueryListEvent | MediaQueryList) => {
     if (theme === 'system') {
-      document.documentElement.classList.toggle('dark', mediaQuery.matches);
+      const isDark = mediaQuery.matches;
+      document.documentElement.classList.toggle('dark', isDark);
+      updateThemeColorMeta(isDark);
     }
   };
 
@@ -22,11 +32,15 @@ export const useTheme = () => {
     // Apply theme based on the current selection
     if (theme === 'system') {
       // For system theme, check the media query
-      document.documentElement.classList.toggle('dark', mediaQuery.matches);
+      const isDark = mediaQuery.matches;
+      document.documentElement.classList.toggle('dark', isDark);
+      updateThemeColorMeta(isDark);
       localStorage.removeItem('theme');
     } else {
       // For explicit theme choices
-      document.documentElement.classList.toggle('dark', theme === 'dark');
+      const isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      updateThemeColorMeta(isDark);
       localStorage.theme = theme;
     }
 
