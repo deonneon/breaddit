@@ -39,7 +39,9 @@ const API_BASE_URL = import.meta.env.DEV
 const fetchSubredditPosts = async (
   subreddit: string,
   limit?: number,
-  sort: SortType = "hot"
+  sort: SortType = "hot",
+  commentLimit?: number,
+  retryCount = 0
 ): Promise<RedditPost[]> => {
   try {
     // Fix URL construction to work with both absolute and relative paths
@@ -57,6 +59,11 @@ const fetchSubredditPosts = async (
 
     // Add sort parameter
     url.searchParams.append("sort", sort);
+    
+    // Add comment limit parameter if provided
+    if (commentLimit) {
+      url.searchParams.append("commentLimit", commentLimit.toString());
+    }
 
     const response = await fetch(url.toString(), {
       headers: {
@@ -65,6 +72,33 @@ const fetchSubredditPosts = async (
     });
 
     if (!response.ok) {
+      // If this is our first or second retry attempt
+      if (retryCount < 2) {
+        let newLimit = limit;
+        let newCommentLimit = commentLimit;
+        
+        // Strategy 1: Reduce post limit if it's set and above minimum
+        if (limit && limit > 5) {
+          newLimit = Math.floor(limit / 2);
+        }
+        
+        // Strategy 2: Reduce comment limit if it's set, or set a default comment limit if none was set
+        if (commentLimit && commentLimit > 10) {
+          newCommentLimit = Math.floor(commentLimit / 2);
+        } else if (!commentLimit) {
+          // If no comment limit was set initially, add one for the retry
+          newCommentLimit = 50;
+        }
+        
+        console.warn(
+          `Fetch failed, retrying with ${newLimit !== limit ? 'reduced post limit ' + newLimit : 'same post limit'} and ${
+            newCommentLimit ? (commentLimit ? 'reduced comment limit ' + newCommentLimit : 'added comment limit ' + newCommentLimit) : 'same settings'
+          }`
+        );
+        
+        return fetchSubredditPosts(subreddit, newLimit, sort, newCommentLimit, retryCount + 1);
+      }
+      
       const errorData = await response.text();
       throw new Error(errorData || `HTTP error! status: ${response.status}`);
     }
