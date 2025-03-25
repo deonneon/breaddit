@@ -153,7 +153,7 @@ const MainContent: FC<MainContentProps> = ({
             </h1>
             <button
               onClick={refreshPosts}
-              className="p-2 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-Igray-700 transition-all hover:rotate-180 duration-500"
+              className="p-2 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:rotate-180 duration-500"
               aria-label="Refresh posts"
             >
               <svg

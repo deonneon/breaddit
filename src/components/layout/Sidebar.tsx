@@ -224,11 +224,10 @@ const Sidebar = ({
         )}
       </div>
 
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between mb-3">
+      <div className="p-2 px-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between">
           <div className="text-xs text-gray-500 dark:text-gray-400">
             <p>Breaddit - Reddit Reader</p>
-            <p className="mt-1">Made with ❤️</p>
           </div>
           <button
             onClick={openSettings}
