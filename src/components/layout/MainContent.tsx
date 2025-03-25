@@ -232,7 +232,7 @@ const MainContent: FC<MainContentProps> = ({
         <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
 
         {/* Subreddit title, sort options, and refresh button - visible only on desktop (not 2xl) */}
-        <div className="hidden md:flex 2xl:hidden items-center mb-4 gap-2">
+        <div className="hidden md:flex 2xl:hidden items-center mb-6 gap-2">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
             <span className="text-orange-500 mr-2">r/</span>
             {subreddit}
@@ -260,7 +260,7 @@ const MainContent: FC<MainContentProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-6 w-full">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-4 w-full">
           {posts.map((post, index) => (
             <PostCard
               key={post.permalink}
