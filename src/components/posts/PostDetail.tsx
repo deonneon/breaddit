@@ -25,18 +25,53 @@ const PostDetail: FC<PostDetailProps> = ({
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
   // Add local state to track if comments were manually marked as seen
   const [localMarkSeen, setLocalMarkSeen] = useState(false);
+  // Add state to store the processed comments
+  const [processedComments, setProcessedComments] = useState<RedditComment[]>([]);
+
+  // Process comments recursively to handle 'isNew' flags
+  const processCommentsWithNewFlags = useCallback((comments: RedditComment[], markAsSeen: boolean): RedditComment[] => {
+    return comments.map(comment => {
+      const processedReplies: RedditComment[] = comment.replies 
+        ? processCommentsWithNewFlags(comment.replies, markAsSeen) 
+        : [];
+      
+      return {
+        ...comment,
+        isNew: markAsSeen ? false : comment.isNew,
+        replies: processedReplies
+      };
+    });
+  }, []);
 
   // Function to manually mark all comments as seen immediately
   const handleMarkAllSeen = useCallback(() => {
+    // Call the parent function to update localStorage
     markAllCommentsAsSeen(post.permalink, post.comments);
-    setLocalMarkSeen(true); // Update local state to force UI refresh
-  }, [post.permalink, post.comments, markAllCommentsAsSeen]);
+    
+    // Update local state to force UI refresh
+    setLocalMarkSeen(true);
+    
+    // Process all comments to remove isNew flags
+    const updatedComments = processCommentsWithNewFlags(post.comments, true);
+    setProcessedComments(updatedComments);
+  }, [post.permalink, post.comments, markAllCommentsAsSeen, processCommentsWithNewFlags]);
 
   // Check if this is the first time seeing this post/thread
   const isFirstTimeSeenPost = !seenComments[post.permalink];
 
   // Get the count of new comments for the post, respecting local marked state
   const newCommentsCount = localMarkSeen ? 0 : (post._newCommentsCount || 0);
+
+  // When post changes, process comments
+  useEffect(() => {
+    if (post.comments?.length > 0) {
+      // Process comments with their current isNew state
+      const updatedComments = processCommentsWithNewFlags(post.comments, localMarkSeen);
+      setProcessedComments(updatedComments);
+    } else {
+      setProcessedComments([]);
+    }
+  }, [post.comments, localMarkSeen, processCommentsWithNewFlags]);
 
   // When seenComments or post changes, check if we should mark as unseen
   useEffect(() => {
@@ -69,6 +104,9 @@ const PostDetail: FC<PostDetailProps> = ({
       handleMarkAllSeen();
     }
   };
+
+  // Use the processed comments instead of post.comments
+  const commentsToRender = processedComments.length > 0 ? processedComments : post.comments;
 
   return (
     <div 
@@ -245,8 +283,8 @@ const PostDetail: FC<PostDetailProps> = ({
             </button>
           )}
         </h3>
-        {post.comments.length > 0 ? (
-          post.comments.map((comment) => (
+        {commentsToRender.length > 0 ? (
+          commentsToRender.map((comment) => (
             <Comment
               key={comment.id}
               comment={comment}
@@ -265,7 +303,7 @@ const PostDetail: FC<PostDetailProps> = ({
       <NewCommentsModal
         isOpen={showNewCommentsModal}
         onClose={handleCloseNewCommentsModal}
-        comments={post.comments}
+        comments={commentsToRender}
         postTitle={post.title || ""}
       />
     </div>
