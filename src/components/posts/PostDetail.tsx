@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useEffect } from 'react';
+import { FC, useState, useCallback } from 'react';
 import type { RedditPost, RedditComment } from '../../services/redditService';
 import Comment from './Comment';
 import { formatDate } from '../../utils/formatters';
@@ -21,16 +21,12 @@ const PostDetail: FC<PostDetailProps> = ({
   seenComments,
   markAllCommentsAsSeen
 }) => {
-  // Add a countdown timer for when new comments will be marked as seen
-  const [countdown, setCountdown] = useState<number | null>(null);
   // Add state for new comments modal
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
 
   // Function to manually mark all comments as seen immediately
   const handleMarkAllSeen = useCallback(() => {
     markAllCommentsAsSeen(post.permalink, post.comments);
-    // Reset the countdown
-    setCountdown(null);
   }, [post.permalink, post.comments, markAllCommentsAsSeen]);
 
   // Get the count of new comments for the post
@@ -54,48 +50,6 @@ const PostDetail: FC<PostDetailProps> = ({
   // Calculate values
   const newCommentsCount = countNewComments();
 
-  // Start countdown when we have new comments
-  useEffect(() => {
-    if (newCommentsCount > 0) {
-      // Only start the countdown for posts we've seen before - not for first loads
-      const isFirstTimeSeenPost = !(
-        post.permalink && seenComments[post.permalink]?.commentIds?.length > 0
-      );
-
-      // Don't start countdown if modal is open
-      if (!isFirstTimeSeenPost && !showNewCommentsModal) {
-        setCountdown(30); // 30 seconds
-
-        const timer = setInterval(() => {
-          setCountdown((prev) => {
-            if (prev === null || prev <= 1) {
-              clearInterval(timer);
-              // Call handleMarkAllSeen when countdown completes
-              if (prev !== null && prev <= 1) {
-                handleMarkAllSeen();
-              }
-              return null;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-
-        return () => clearInterval(timer);
-      } else if (showNewCommentsModal) {
-        // Pause the countdown while modal is open
-        setCountdown((prev) => prev || 60);
-      }
-    } else {
-      setCountdown(null);
-    }
-  }, [
-    newCommentsCount,
-    post.permalink,
-    seenComments,
-    showNewCommentsModal,
-    handleMarkAllSeen
-  ]);
-
   // Handle opening the new comments modal
   const handleOpenNewCommentsModal = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent event from bubbling up
@@ -111,17 +65,6 @@ const PostDetail: FC<PostDetailProps> = ({
     // Mark all comments as seen if requested
     if (markAsSeen) {
       handleMarkAllSeen();
-    } else {
-      // Just resume countdown when modal closes without marking
-      if (newCommentsCount > 0) {
-        const isFirstTimeSeenPost = !(
-          post.permalink && seenComments[post.permalink]?.commentIds?.length > 0
-        );
-
-        if (!isFirstTimeSeenPost) {
-          setCountdown(60);
-        }
-      }
     }
   };
 
@@ -288,13 +231,17 @@ const PostDetail: FC<PostDetailProps> = ({
               </button>
             )}
           </div>
-          <div className="flex items-center">
-            {countdown !== null && (
-              <span className="text-xs text-green-600 dark:text-green-400 flex items-center">
-                (marking as seen in {countdown}s)
-              </span>
-            )}
-          </div>
+          {newCommentsCount > 0 && (
+            <button
+              onClick={handleMarkAllSeen}
+              className="text-xs px-3 py-1 bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-800/40 active:bg-orange-300 dark:active:bg-orange-700/50 text-orange-700 dark:text-orange-400 rounded-full transition-colors flex items-center"
+              aria-label="Mark all comments as seen"
+              tabIndex={0}
+            >
+              <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mr-1.5"></span>
+              Mark all seen
+            </button>
+          )}
         </h3>
         {post.comments.length > 0 ? (
           post.comments.map((comment) => (

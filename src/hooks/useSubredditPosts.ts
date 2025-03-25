@@ -53,7 +53,8 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
   const { 
     markNewComments, 
     collectCommentIds, 
-    checkForNewComments
+    checkForNewComments,
+    countNewComments
   } = useComments();
 
   // Function to get current sort preference for the active subreddit
@@ -189,13 +190,9 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       const currentSort = getCurrentSortPreference();
 
       if (cachedData && now - cachedData.timestamp < CACHE_DURATION) {
-        console.log(`Using cached data for subreddit: ${subreddit}`);
-
         // We're using cached data - mark posts as not newly fetched
         // but still process for new comments compared to known comment IDs
         const markedData = cachedData.posts.map((post) => {
-          console.log(`Using cached data for post: ${post.permalink}`);
-
           // Process comments to mark any new ones based on the post's permalink
           const processedComments = markNewComments(post.comments, post.permalink);
 

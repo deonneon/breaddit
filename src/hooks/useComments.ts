@@ -25,14 +25,6 @@ export const useComments = () => {
       const isFirstTimeSeenThread = !seenComments[postPermalink];
       const postSeenComments = seenComments[postPermalink]?.commentIds || [];
 
-      // Debug info
-      console.log(`Marking comments for ${postPermalink}`, {
-        totalComments: comments.length,
-        knownCommentIds: postSeenComments.length,
-        isFirstTimeSeenThread,
-        seenCommentsKeys: Object.keys(seenComments),
-      });
-
       return comments.map((comment) => {
         // Only mark as new if:
         // 1. This is NOT the first time we're seeing this thread AND
@@ -116,13 +108,34 @@ export const useComments = () => {
     updateSeenComments(postPermalink, allCommentIds);
   }, [collectCommentIds, updateSeenComments]);
 
+  // Count new comments in a thread
+  const countNewComments = useCallback((comments: RedditComment[]): number => {
+    if (!comments || !Array.isArray(comments)) return 0;
+    
+    let count = 0;
+    
+    const countNew = (commentList: RedditComment[]) => {
+      if (!commentList) return;
+      
+      for (const comment of commentList) {
+        if (comment.isNew) count++;
+        if (comment.replies && comment.replies.length > 0) {
+          countNew(comment.replies);
+        }
+      }
+    };
+    
+    countNew(comments);
+    return count;
+  }, []);
+
   return {
     seenComments,
-    setSeenComments,
     markNewComments,
     collectCommentIds,
     checkForNewComments,
     updateSeenComments,
     markAllCommentsAsSeen,
+    countNewComments
   };
 }; 

@@ -103,9 +103,17 @@ const NewCommentsModal = ({
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 pb-2 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
             <button
               onClick={() => onClose(true)}
-              className="text-xs px-3 py-1 bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-800/40 text-orange-700 dark:text-orange-400 rounded-full transition-colors"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onClose(true);
+                }
+              }}
+              className="text-xs px-3 py-1 bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-800/40 active:bg-orange-300 dark:active:bg-orange-700/50 text-orange-700 dark:text-orange-400 rounded-full transition-colors flex items-center"
               aria-label="Close and mark all comments as seen"
+              tabIndex={0}
             >
+              <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mr-1.5"></span>
               Mark all seen
             </button>
           </div>
