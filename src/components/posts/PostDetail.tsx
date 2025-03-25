@@ -45,16 +45,19 @@ const PostDetail: FC<PostDetailProps> = ({
 
   // Function to manually mark all comments as seen immediately
   const handleMarkAllSeen = useCallback(() => {
+    // Use commentsToRender which includes all processed comments
+    const commentsToMark = processedComments.length > 0 ? processedComments : post.comments;
+    
     // Call the parent function to update localStorage
-    markAllCommentsAsSeen(post.permalink, post.comments);
+    markAllCommentsAsSeen(post.permalink, commentsToMark);
     
     // Update local state to force UI refresh
     setLocalMarkSeen(true);
     
     // Process all comments to remove isNew flags
-    const updatedComments = processCommentsWithNewFlags(post.comments, true);
+    const updatedComments = processCommentsWithNewFlags(commentsToMark, true);
     setProcessedComments(updatedComments);
-  }, [post.permalink, post.comments, markAllCommentsAsSeen, processCommentsWithNewFlags]);
+  }, [post.permalink, post.comments, processedComments, markAllCommentsAsSeen, processCommentsWithNewFlags]);
 
   // Check if this is the first time seeing this post/thread
   const isFirstTimeSeenPost = !seenComments[post.permalink];
