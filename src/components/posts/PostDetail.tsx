@@ -23,17 +23,20 @@ const PostDetail: FC<PostDetailProps> = ({
 }) => {
   // Add state for new comments modal
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
+  // Add local state to track if comments were manually marked as seen
+  const [localMarkSeen, setLocalMarkSeen] = useState(false);
 
   // Function to manually mark all comments as seen immediately
   const handleMarkAllSeen = useCallback(() => {
     markAllCommentsAsSeen(post.permalink, post.comments);
+    setLocalMarkSeen(true); // Update local state to force UI refresh
   }, [post.permalink, post.comments, markAllCommentsAsSeen]);
 
   // Check if this is the first time seeing this post/thread
   const isFirstTimeSeenPost = !seenComments[post.permalink];
 
-  // Get the count of new comments for the post
-  const newCommentsCount = post._newCommentsCount || 0;
+  // Get the count of new comments for the post, respecting local marked state
+  const newCommentsCount = localMarkSeen ? 0 : (post._newCommentsCount || 0);
 
   // When seenComments or post changes, check if we should mark as unseen
   useEffect(() => {
@@ -42,7 +45,12 @@ const PostDetail: FC<PostDetailProps> = ({
     if (isFirstTimeSeenPost && post.comments?.length > 0) {
       handleMarkAllSeen();
     }
-  }, [isFirstTimeSeenPost, post.comments, handleMarkAllSeen]);
+    
+    // Reset local mark seen when the post changes
+    if (post.permalink) {
+      setLocalMarkSeen(false);
+    }
+  }, [isFirstTimeSeenPost, post.comments, post.permalink, handleMarkAllSeen]);
 
   // Handle opening the new comments modal
   const handleOpenNewCommentsModal = (e: React.MouseEvent) => {
@@ -207,7 +215,7 @@ const PostDetail: FC<PostDetailProps> = ({
               />
             </svg>
             <span>Comments</span>
-            {newCommentsCount > 0 && (
+            {newCommentsCount > 0 && !localMarkSeen && (
               <button
                 onClick={handleOpenNewCommentsModal}
                 onKeyDown={(e) => {
@@ -225,7 +233,7 @@ const PostDetail: FC<PostDetailProps> = ({
               </button>
             )}
           </div>
-          {newCommentsCount > 0 && (
+          {newCommentsCount > 0 && !localMarkSeen && (
             <button
               onClick={handleMarkAllSeen}
               className="text-xs px-3 py-1 bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-800/40 active:bg-orange-300 dark:active:bg-orange-700/50 text-orange-700 dark:text-orange-400 rounded-full transition-colors flex items-center"
