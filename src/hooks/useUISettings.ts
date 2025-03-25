@@ -1,8 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useTheme} from './useTheme';
 
 export type FontSize = 'small' | 'medium' | 'large';
 
 export const useUISettings = () => {
+  // Use the theme hook
+  const { theme, setTheme } = useTheme();
+  
   // Add state for font size with localStorage persistence
   const [fontSize, setFontSize] = useState<FontSize>(() => {
     const savedFontSize = localStorage.getItem('fontSize');
@@ -96,5 +100,7 @@ export const useUISettings = () => {
     toggleSidebar,
     showScrollTop,
     setShowScrollTop,
+    theme,
+    setTheme,
   };
 }; 
