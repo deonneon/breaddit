@@ -44,6 +44,9 @@ const API_BASE_URL = import.meta.env.DEV
 const MIN_REQUEST_INTERVAL = 1000; // Minimum 1 second between requests
 let lastRequestTime = 0;
 
+// Custom User-Agent to help prevent rate limiting
+const CUSTOM_USER_AGENT = "Breaddit_Client/1.0 (Contact: dtnifti@gmail.com)";
+
 // Helper function to ensure we don't exceed rate limits
 const throttledFetch = async (url: URL, options: RequestInit = {}): Promise<Response> => {
   const now = Date.now();
@@ -57,8 +60,15 @@ const throttledFetch = async (url: URL, options: RequestInit = {}): Promise<Resp
   // Update the last request time
   lastRequestTime = Date.now();
   
-  // Make the fetch request
-  return fetch(url.toString(), options);
+  // Add custom User-Agent to headers
+  const headers = {
+    "User-Agent": CUSTOM_USER_AGENT,
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+  
+  // Make the fetch request with the updated headers
+  return fetch(url.toString(), { ...options, headers });
 };
 
 // Function to get lightweight post data without full comments
@@ -79,11 +89,7 @@ const getPostMetadata = async (
     }
     url.searchParams.append("sort", sort);
     
-    const response = await throttledFetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await throttledFetch(url);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -111,11 +117,7 @@ const fetchSinglePost = async (
       url.searchParams.append("commentLimit", commentLimit.toString());
     }
     
-    const response = await throttledFetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
+    const response = await throttledFetch(url);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -216,11 +218,7 @@ const fetchSubredditPosts = async (
       url.searchParams.append("commentLimit", commentLimit.toString());
     }
 
-    const response = await throttledFetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await throttledFetch(url);
 
     if (!response.ok) {
       // If we got rate limited
