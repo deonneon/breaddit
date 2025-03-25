@@ -1,4 +1,4 @@
-type RedditComment = {
+export type RedditComment = {
   id: string;
   author: string;
   created_utc: number;
@@ -7,7 +7,7 @@ type RedditComment = {
   isNew?: boolean;
 };
 
-type RedditPost = {
+export type RedditPost = {
   title: string;
   author: string;
   created_utc: number;
@@ -25,10 +25,14 @@ type RedditPost = {
     hasNewComments: boolean;
     allCommentIds: string[];
   };
+  // New fields for comment tracking
+  _hasNewComments?: boolean;
+  _newCommentsCount?: number;
+  _commentCount?: number;
 };
 
 // Define valid sort types
-type SortType = "hot" | "new";
+export type SortType = "hot" | "new";
 
 // For same-domain deployment, we can use a relative URL
 // In development, we'll use the full URL from the environment variable
@@ -265,4 +269,3 @@ const fetchSubredditPosts = async (
 };
 
 export { fetchSubredditPosts };
-export type { RedditPost, RedditComment, SortType };

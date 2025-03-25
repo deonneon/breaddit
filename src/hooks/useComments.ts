@@ -67,21 +67,28 @@ export const useComments = () => {
 
   // Helper function to check if a comment thread has any new comments
   const checkForNewComments = useCallback(
-    (comments: RedditComment[]): boolean => {
+    (comments: RedditComment[], postPermalink: string): boolean => {
       if (!comments || !Array.isArray(comments)) return false;
+      
+      // First time seeing this thread means no "new" comments
+      const isFirstTimeSeenThread = !seenComments[postPermalink];
+      if (isFirstTimeSeenThread) return false;
+      
+      const postSeenComments = seenComments[postPermalink]?.commentIds || [];
 
       for (const comment of comments) {
-        if (comment.isNew) return true;
+        // Check if this comment is new
+        if (!postSeenComments.includes(comment.id)) return true;
 
         if (comment.replies && comment.replies.length > 0) {
-          const hasNewReplies = checkForNewComments(comment.replies);
+          const hasNewReplies = checkForNewComments(comment.replies, postPermalink);
           if (hasNewReplies) return true;
         }
       }
 
       return false;
     },
-    []
+    [seenComments]
   );
 
   // Function to update the seen comments for a post
@@ -109,16 +116,21 @@ export const useComments = () => {
   }, [collectCommentIds, updateSeenComments]);
 
   // Count new comments in a thread
-  const countNewComments = useCallback((comments: RedditComment[]): number => {
+  const countNewComments = useCallback((comments: RedditComment[], postPermalink: string): number => {
     if (!comments || !Array.isArray(comments)) return 0;
     
+    // First time seeing this thread means no "new" comments
+    const isFirstTimeSeenThread = !seenComments[postPermalink];
+    if (isFirstTimeSeenThread) return 0;
+    
+    const postSeenComments = seenComments[postPermalink]?.commentIds || [];
     let count = 0;
     
     const countNew = (commentList: RedditComment[]) => {
       if (!commentList) return;
       
       for (const comment of commentList) {
-        if (comment.isNew) count++;
+        if (!postSeenComments.includes(comment.id)) count++;
         if (comment.replies && comment.replies.length > 0) {
           countNew(comment.replies);
         }
@@ -127,7 +139,7 @@ export const useComments = () => {
     
     countNew(comments);
     return count;
-  }, []);
+  }, [seenComments]);
 
   return {
     seenComments,

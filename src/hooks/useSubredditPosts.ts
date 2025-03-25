@@ -53,7 +53,6 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
   const { 
     markNewComments, 
     collectCommentIds, 
-    checkForNewComments,
     countNewComments
   } = useComments();
 
@@ -122,20 +121,31 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || 4;
       const data = await fetchSubredditPosts(subreddit, postLimit, sort);
 
-      // Mark posts as newly fetched
-      const markedData = data.map((post) => ({
-        ...post,
-        isNewlyFetched: true,
-      }));
+      // Process each post for improved comment handling
+      const processedData = data.map((post) => {
+        // Process comments to mark which ones are new using markNewComments
+        const processedComments = markNewComments(post.comments, post.permalink);
+        
+        // Count the number of new comments
+        const newCommentsCount = countNewComments(post.comments, post.permalink);
+        
+        return {
+          ...post,
+          isNewlyFetched: true,
+          comments: processedComments,
+          _newCommentsCount: newCommentsCount,
+          _hasNewComments: newCommentsCount > 0
+        };
+      });
 
-      setPosts(markedData);
+      setPosts(processedData);
       setSelectedPostIndex(0); // Reset selected post when changing sort
 
       // Update cache with fresh data
       setCachedPosts((prev) => ({
         ...prev,
         [subreddit]: {
-          posts: markedData,
+          posts: processedData,
           timestamp: Date.now(),
         },
       }));
@@ -144,7 +154,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     } finally {
       setLoading(false);
     }
-  }, [subreddit]);
+  }, [subreddit, markNewComments, countNewComments]);
 
   // Function to update sort preference for a subreddit
   const updateSortPreference = useCallback((updateSubreddit: string, newSort: SortType) => {
@@ -190,16 +200,20 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       const currentSort = getCurrentSortPreference();
 
       if (cachedData && now - cachedData.timestamp < CACHE_DURATION) {
-        // We're using cached data - mark posts as not newly fetched
-        // but still process for new comments compared to known comment IDs
+        // We're using cached data - need to re-process comments for new status
         const markedData = cachedData.posts.map((post) => {
-          // Process comments to mark any new ones based on the post's permalink
+          // Re-process comments to update which ones are new
           const processedComments = markNewComments(post.comments, post.permalink);
-
+          
+          // Update new comments count
+          const newCommentsCount = countNewComments(post.comments, post.permalink);
+          
           return {
             ...post,
             isNewlyFetched: false,
             comments: processedComments,
+            _newCommentsCount: newCommentsCount,
+            _hasNewComments: newCommentsCount > 0
           };
         });
 
@@ -212,30 +226,24 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || 4;
       const data = await fetchSubredditPosts(subreddit, postLimit, currentSort);
 
-      // Process each post to mark new comments and store seen comment IDs
+      // Process each post with comments
       const processedData = data.map((post) => {
-        // Check if we've seen comments from this post before
-        const postPermalink = post.permalink;
-
-        // Process to mark new comments (and build a list of all comments)
-        const processedComments = markNewComments(post.comments, postPermalink);
-
+        // Process comments to mark which ones are new
+        const processedComments = markNewComments(post.comments, post.permalink);
+        
         // Get all comment IDs for this post
         const allCommentIds = collectCommentIds(post.comments);
-
-        // Check if this post has any new comments (only possible for posts we've seen before)
-        const hasNewComments = checkForNewComments(processedComments);
-
-        // Store update info for applying after render
-        post._updateInfo = {
-          hasNewComments,
-          allCommentIds,
-        };
+        
+        // Count new comments
+        const newCommentsCount = countNewComments(post.comments, post.permalink);
 
         return {
           ...post,
           isNewlyFetched: true,
           comments: processedComments,
+          _newCommentsCount: newCommentsCount,
+          _hasNewComments: newCommentsCount > 0,
+          _commentCount: allCommentIds.length,
         };
       });
 
@@ -262,7 +270,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     getCurrentSortPreference,
     markNewComments,
     collectCommentIds,
-    checkForNewComments,
+    countNewComments,
   ]);
 
   // Force refresh posts for the current subreddit
@@ -274,33 +282,27 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
 
       const data = await fetchSubredditPosts(subreddit, undefined, currentSort);
 
-      // Process each post to mark new comments and store seen comment IDs
+      // Process each post with comments
       const now = Date.now();
-
-      // Store all processed posts with potential new comments
+      
+      // Store all processed posts
       const processedData = data.map((post) => {
-        // Check if we've seen comments from this post before
-        const postPermalink = post.permalink;
-
-        // Mark new comments based on what we've seen before
-        const processedComments = markNewComments(post.comments, postPermalink);
-
-        // Get the full list of comment IDs from this refresh
+        // Process comments to mark which ones are new
+        const processedComments = markNewComments(post.comments, post.permalink);
+        
+        // Get the full list of comment IDs
         const allCommentIds = collectCommentIds(post.comments);
-
-        // Check if this post has any new comments
-        const hasNewComments = checkForNewComments(processedComments);
-
-        // Store update info for applying after render
-        post._updateInfo = {
-          hasNewComments,
-          allCommentIds,
-        };
+        
+        // Count new comments
+        const newCommentsCount = countNewComments(post.comments, post.permalink);
 
         return {
           ...post,
           isNewlyFetched: true,
           comments: processedComments,
+          _newCommentsCount: newCommentsCount,
+          _hasNewComments: newCommentsCount > 0,
+          _commentCount: allCommentIds.length,
         };
       });
 
@@ -325,7 +327,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     getCurrentSortPreference,
     markNewComments,
     collectCommentIds,
-    checkForNewComments,
+    countNewComments,
   ]);
 
 

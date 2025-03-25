@@ -1,4 +1,4 @@
-import { FC, useState, useCallback } from 'react';
+import { FC, useState, useCallback, useEffect } from 'react';
 import type { RedditPost, RedditComment } from '../../services/redditService';
 import Comment from './Comment';
 import { formatDate } from '../../utils/formatters';
@@ -29,26 +29,20 @@ const PostDetail: FC<PostDetailProps> = ({
     markAllCommentsAsSeen(post.permalink, post.comments);
   }, [post.permalink, post.comments, markAllCommentsAsSeen]);
 
+  // Check if this is the first time seeing this post/thread
+  const isFirstTimeSeenPost = !seenComments[post.permalink];
+
   // Get the count of new comments for the post
-  const countNewComments = useCallback(() => {
-    let count = 0;
-    const countNew = (comments: RedditComment[]) => {
-      if (!comments) return;
+  const newCommentsCount = post._newCommentsCount || 0;
 
-      for (const comment of comments) {
-        if (comment.isNew) count++;
-        if (comment.replies && comment.replies.length > 0) {
-          countNew(comment.replies);
-        }
-      }
-    };
-
-    countNew(post.comments);
-    return count;
-  }, [post.comments]);
-
-  // Calculate values
-  const newCommentsCount = countNewComments();
+  // When seenComments or post changes, check if we should mark as unseen
+  useEffect(() => {
+    // If there are comments but this is our first time seeing the post,
+    // we should automatically mark all comments as seen
+    if (isFirstTimeSeenPost && post.comments?.length > 0) {
+      handleMarkAllSeen();
+    }
+  }, [isFirstTimeSeenPost, post.comments, handleMarkAllSeen]);
 
   // Handle opening the new comments modal
   const handleOpenNewCommentsModal = (e: React.MouseEvent) => {
@@ -263,7 +257,7 @@ const PostDetail: FC<PostDetailProps> = ({
       <NewCommentsModal
         isOpen={showNewCommentsModal}
         onClose={handleCloseNewCommentsModal}
-        comments={post.comments || []}
+        comments={post.comments}
         postTitle={post.title || ""}
       />
     </div>
