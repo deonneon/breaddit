@@ -38,11 +38,11 @@ export const renderMarkdown = (text: string) => {
           const isInline = !match;
           
           return isInline ? (
-            <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs md:text-sm">
+            <code className="bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-blue-400 px-1 rounded text-xs md:text-sm">
               {children}
             </code>
           ) : (
-            <pre className="bg-gray-200 dark:bg-gray-700 p-2 rounded overflow-x-auto mb-2">
+            <pre className="bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-blue-400 p-2 rounded overflow-x-auto mb-2">
               <code className={`text-xs md:text-sm ${className}`}>
                 {children}
               </code>
