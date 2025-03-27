@@ -112,13 +112,20 @@ const App = () => {
       {/* Overlay to close sidebar when clicking outside on mobile */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 top-16 z-10 bg-black/50 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-[15] bg-black/50 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      <main className="flex-1 max-w-full overflow-hidden h-auto min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))] md:ml-64">
+      <main
+        className={`
+          flex-1 max-w-full overflow-hidden 
+          min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))] md:ml-64
+          ${sidebarOpen ? "pt-0" : "pt-16"} md:pt-0
+          transition-spacing duration-300
+        `}
+      >
         <MainContent
           posts={posts}
           loading={loading}

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import type { SortType } from "../../services/redditService";
 import type { FontSize } from "../../hooks/useUISettings";
 import Sidebar from "./Sidebar";
@@ -35,31 +35,24 @@ const MobileHeader: FC<MobileHeaderProps> = ({
   onSubredditSelect,
   sidebarOpen,
 }) => {
-  const [sidebarHeight, setSidebarHeight] = useState<number>(0);
-
-  useEffect(() => {
-    const calculateSidebarHeight = () => {
-      const headerHeight = 64; // Adjust this if the header height changes
-      // Use the custom variable to get the actual viewport height
-      const vh = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--vh")
-      );
-      const usableHeight = vh * 100 - headerHeight; // vh is in units of 1% of viewport height
-      setSidebarHeight(usableHeight);
-    };
-
-    calculateSidebarHeight();
-    window.addEventListener("resize", calculateSidebarHeight);
-
-    return () => {
-      window.removeEventListener("resize", calculateSidebarHeight);
-    };
-  }, []);
-
   return (
     <>
-      {/* Mobile Header Bar */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 shrink-0 shadow-sm">
+      {/* Mobile Header Bar - Hide when sidebar is open */}
+      <div
+        className={`
+          md:hidden fixed top-0 left-0 right-0 z-10
+          flex items-center justify-between p-4 
+          bg-white dark:bg-gray-800 
+          border-b border-gray-200 dark:border-gray-700 
+          h-16 shrink-0 shadow-sm
+          transition-transform duration-300
+          ${
+            sidebarOpen
+              ? "transform -translate-y-full"
+              : "transform translate-y-0"
+          }
+        `}
+      >
         <div className="flex items-center">
           <button
             onClick={toggleSidebar}
@@ -138,12 +131,9 @@ const MobileHeader: FC<MobileHeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - fixed position with custom viewport height */}
       {sidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 top-16 z-20 w-64"
-          style={{ height: `${sidebarHeight}px` }}
-        >
+        <div className="md:hidden fixed inset-0 top-0 z-20 w-2/3 h-[calc(100*var(--vh,1vh))] overflow-hidden">
           <Sidebar
             subreddits={subreddits}
             selectedSubreddit={subreddit}
