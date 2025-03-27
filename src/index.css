@@ -21,8 +21,18 @@
 /* Default is dark mode */
 body {
   min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
+  overflow-x: hidden;
   transition: background-color var(--transition-speed),
     color var(--transition-speed);
+  /* Prevent elastic scrolling/bounce effect in Safari */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+html {
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 /* For browsers that support CSS zoom but not the zoom property directly */
@@ -79,7 +89,6 @@ button:active {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
-
 
 /* Animations */
 @keyframes fadeIn {
@@ -142,6 +151,7 @@ a {
 }
 
 /* Ensure Tailwind prose classes don't override our font size */
-.prose.comment-body *, .prose.post-content * {
+.prose.comment-body *,
+.prose.post-content * {
   font-size: inherit;
 }

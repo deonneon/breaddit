@@ -118,7 +118,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 h-[calc(100*var(--vh,1vh))] md:h-[calc(100*var(--vh,1vh))]">
+      <main className="flex-1 h-full">
         <MainContent
           posts={posts}
           loading={loading}

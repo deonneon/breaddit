@@ -74,7 +74,9 @@ const MainContent: FC<MainContentProps> = ({
 
   // Function to scroll to top
   const scrollToTop = () => {
-    window.scrollTo({
+    // Use documentElement for better Safari compatibility
+    const scrollElement = document.documentElement;
+    scrollElement.scrollTo({
       top: 0,
       behavior: "smooth",
     });
@@ -234,7 +236,7 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For mobile and other screens: Regular post grid view */}
-      <div className="w-full 2xl:hidden p-4 md:p-8 overflow-y-auto">
+      <div className="w-full 2xl:hidden p-4 md:p-8">
         {/* Intersection observer marker at the top */}
         <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
 
