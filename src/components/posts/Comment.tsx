@@ -47,15 +47,15 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
       <div
         className={`${getIndentClass()} ${commentClass} transition-all duration-200 ${
           comment.isNew ? "pl-3 md:pl-4" : "pl-2 md:pl-4"
-        }`}
+        } max-w-full overflow-hidden`}
       >
-        <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
+        <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex flex-wrap items-center">
           {depth === 0 ? (
             <span className="inline-block w-2 h-1 bg-gray-300 rounded-half mr-2 flex-shrink-0"></span>
           ) : (
             ""
           )}
-          <span className="font-medium">{comment.author}</span>
+          <span className="font-medium break-all">{comment.author}</span>
           <span className="font-light ml-2 text-xs opacity-80">
             {formatDate(timestamp)}
           </span>

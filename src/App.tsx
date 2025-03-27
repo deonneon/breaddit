@@ -76,7 +76,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-[calc(100*var(--vh,1vh))] h-auto overflow-x-hidden`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-[calc(100*var(--vh,1vh))] w-full max-w-full overflow-hidden`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
@@ -96,7 +96,7 @@ const App = () => {
       />
 
       {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden md:block md:h-[calc(100*var(--vh,1vh))] w-64 md:flex-shrink-0">
+      <div className="hidden md:block md:fixed md:left-0 md:top-0 md:h-[calc(100*var(--vh,1vh))] w-64 md:z-20">
         <Sidebar
           subreddits={DEFAULT_SUBREDDITS}
           selectedSubreddit={subreddit}
@@ -118,7 +118,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 h-auto min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))]">
+      <main className="flex-1 max-w-full overflow-hidden h-auto min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))] md:ml-64">
         <MainContent
           posts={posts}
           loading={loading}

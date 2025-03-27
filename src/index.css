@@ -19,6 +19,15 @@
 }
 
 /* Default is dark mode */
+html,
+body,
+#root {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
+}
+
 body {
   min-height: 100vh;
   min-height: calc(100 * var(--vh, 1vh));
@@ -27,11 +36,6 @@ body {
     color var(--transition-speed);
   /* Prevent elastic scrolling/bounce effect in Safari */
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
-}
-
-html {
-  overflow-x: hidden;
   overscroll-behavior: none;
 }
 

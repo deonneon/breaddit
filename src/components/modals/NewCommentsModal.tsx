@@ -104,7 +104,7 @@ const NewCommentsModal = ({
             <button
               onClick={() => onClose(true)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   onClose(true);
                 }
@@ -126,7 +126,7 @@ const NewCommentsModal = ({
               className="border-b border-gray-100 dark:border-gray-700 pb-1 last:border-0"
             >
               {/* Render each comment in the thread */}
-              <div className="relative space-y-3">
+              <div className="relative space-y-3 max-w-full overflow-hidden">
                 {thread.threadComments.map((comment, commentIndex) => {
                   const isNewComment = commentIndex === thread.newCommentIndex;
                   const depth = commentIndex; // Depth increases with each level
@@ -134,7 +134,7 @@ const NewCommentsModal = ({
                   return (
                     <div
                       key={comment.id}
-                      className={`relative z-10 ${
+                      className={`relative z-10 max-w-full overflow-hidden ${
                         isNewComment ? "animate-highlight rounded-md py-1" : ""
                       }`}
                     >
@@ -143,12 +143,12 @@ const NewCommentsModal = ({
                         <div
                           className={`${getIndentClass(
                             depth
-                          )} pl-4 border-l-2 border-gray-300 dark:border-gray-600 pb-1`}
+                          )} pl-4 border-l-2 border-gray-300 dark:border-gray-600 pb-1 max-w-full overflow-hidden`}
                         >
-                          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-between font-medium">
-                              {comment.author}
+                          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-between font-medium break-words">
+                            {comment.author}
                           </div>
-                          <div className="comment-body text-gray-700 dark:text-gray-300 break-words prose dark:prose-invert max-w-none">
+                          <div className="comment-body text-gray-700 dark:text-gray-300 break-words prose dark:prose-invert max-w-full overflow-hidden">
                             {renderMarkdown(comment.body)}
                           </div>
                         </div>

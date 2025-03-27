@@ -127,13 +127,13 @@ const PostDetail: FC<PostDetailProps> = ({
   return (
     <div
       key={post.permalink}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden max-w-full"
     >
-      <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center">
+      <h5 className="text-md md:text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center break-words">
         {post.title}
       </h5>
 
-      <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">
+      <div className="flex flex-wrap items-center text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">
         <div className="flex items-center mr-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +199,7 @@ const PostDetail: FC<PostDetailProps> = ({
 
       {/* Display the submission body if it exists */}
       {post.selftext && (
-        <div className="post-content mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 prose dark:prose-invert">
+        <div className="post-content mt-2 mb-2 text-gray-800 dark:text-gray-200 break-words bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 prose dark:prose-invert max-w-full overflow-hidden">
           {renderMarkdown(post.selftext.trimStart())}
         </div>
       )}
@@ -219,7 +219,7 @@ const PostDetail: FC<PostDetailProps> = ({
               </a>
             </div>
           ) : (
-            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex justify-center overflow-hidden">
+            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex justify-center overflow-hidden max-w-full">
               <img
                 src={post.url_overridden_by_dest || post.url}
                 alt={post.title}

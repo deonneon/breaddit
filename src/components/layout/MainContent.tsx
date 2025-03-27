@@ -155,7 +155,7 @@ const MainContent: FC<MainContentProps> = ({
 
   // For 2xl screens, we'll display a different layout with a traditional sidebar
   return (
-    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900">
+    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
       <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-[calc(100*var(--vh,1vh))] 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
         {/* Subreddit title and refresh button */}
@@ -247,7 +247,7 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For mobile and other screens: Regular post grid view */}
-      <div className="w-full 2xl:hidden p-4 md:p-8">
+      <div className="w-full 2xl:hidden p-4 md:p-8 overflow-hidden">
         {/* Intersection observer marker at the top */}
         <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
 
@@ -280,7 +280,7 @@ const MainContent: FC<MainContentProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-4 w-full">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-4 w-full max-w-full">
           {posts.map((post, index) => (
             <PostCard
               key={post.permalink}
@@ -295,7 +295,7 @@ const MainContent: FC<MainContentProps> = ({
           ))}
         </div>
 
-        <div className="space-y-8 pb-16 w-full">
+        <div className="space-y-8 pb-16 w-full max-w-full">
           {selectedPostIndex < posts.length && (
             <PostDetail
               post={posts[selectedPostIndex]}
