@@ -41,9 +41,7 @@ const MainContent: FC<MainContentProps> = ({
   showScrollTop,
   setShowScrollTop,
 }) => {
-  // Create a ref for the scrollable content container
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  // Create a ref for an element at the top of the page (for intersection observer)
+  // Create a ref for the top marker (for intersection observer)
   const topMarkerRef = useRef<HTMLDivElement>(null);
 
   // Use IntersectionObserver to detect when we've scrolled past the top
@@ -54,7 +52,7 @@ const MainContent: FC<MainContentProps> = ({
     if (is2XL || !isMobile || !topMarkerRef.current) return;
 
     const options = {
-      root: scrollContainerRef.current,
+      root: null, // Use the viewport as the root instead of a specific container
       threshold: 0,
       rootMargin: "-200px 0px 0px 0px", // Consider it "out of view" when 200px down
     };
@@ -76,12 +74,10 @@ const MainContent: FC<MainContentProps> = ({
 
   // Function to scroll to top
   const scrollToTop = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   if (loading) {
@@ -146,7 +142,7 @@ const MainContent: FC<MainContentProps> = ({
 
   // For 2xl screens, we'll display a different layout with a traditional sidebar
   return (
-    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900 overflow-hidden">
+    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900">
       {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
       <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-screen 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
         {/* Subreddit title and refresh button */}
@@ -238,10 +234,7 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For mobile and other screens: Regular post grid view */}
-      <div
-        ref={scrollContainerRef}
-        className="w-full 2xl:hidden p-4 md:p-8 overflow-y-auto overflow-x-hidden h-[calc(100vh-4rem)] md:h-full min-h-0 flex-1"
-      >
+      <div className="w-full 2xl:hidden p-4 md:p-8 overflow-y-auto">
         {/* Intersection observer marker at the top */}
         <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
 

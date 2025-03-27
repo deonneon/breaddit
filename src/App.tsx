@@ -28,10 +28,7 @@ const App = () => {
   } = useUISettings();
 
   // Get comments functionality from hook
-  const {
-    seenComments,
-    markAllCommentsAsSeen,
-  } = useComments();
+  const { seenComments, markAllCommentsAsSeen } = useComments();
 
   // Get subreddit posts functionality from hook
   const {
@@ -49,7 +46,7 @@ const App = () => {
     updateGlobalSortPreference,
     updateCurrentSortPreference,
     sortPreferences,
-    refreshPosts
+    refreshPosts,
   } = useSubredditPosts("thewallstreet");
 
   const handleSubredditSelect = (selectedSubreddit: string) => {
@@ -60,7 +57,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen max-h-screen overflow-hidden overflow-x-hidden relative`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen h-full`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
@@ -102,7 +99,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 overflow-hidden overflow-x-hidden flex flex-col h-screen md:h-screen">
+      <main className="flex-1 h-screen md:h-screen">
         <MainContent
           posts={posts}
           loading={loading}
