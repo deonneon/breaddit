@@ -3,6 +3,7 @@ import PostCard from "../posts/PostCard";
 import PostDetail from "../posts/PostDetail";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ScrollToTop from "../ui/ScrollToTop";
+import MarkAllSeen from "../ui/MarkAllSeen";
 import type { RedditPost, RedditComment } from "../../services/redditService";
 
 interface MainContentProps {
@@ -76,6 +77,16 @@ const MainContent: FC<MainContentProps> = ({
     document.body.scrollTo({
       top: 0,
       behavior: "smooth",
+    });
+  };
+
+  // Function to mark all posts as seen
+  const handleMarkAllSeen = () => {
+    posts.forEach((post) => {
+      markPostAsRead(post.permalink);
+      if (post.comments) {
+        markAllCommentsAsSeen(post.permalink, post.comments);
+      }
     });
   };
 
@@ -287,6 +298,9 @@ const MainContent: FC<MainContentProps> = ({
             />
           )}
         </div>
+
+        {/* Mark all seen button */}
+        <MarkAllSeen onClick={handleMarkAllSeen} />
 
         {/* Scroll to top button */}
         <ScrollToTop show={showScrollTop} onClick={scrollToTop} />
