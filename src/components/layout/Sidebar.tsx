@@ -133,7 +133,7 @@ const Sidebar = ({
           <h2 className="text-3xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
+              className="h-7 w-7 md:h-4 md:w-4 mr-2"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

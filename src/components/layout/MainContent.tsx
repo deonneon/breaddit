@@ -1,4 +1,4 @@
-import { FC, useRef, useEffect } from "react";
+import { FC, useEffect } from "react";
 import PostCard from "../posts/PostCard";
 import PostDetail from "../posts/PostDetail";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -41,34 +41,20 @@ const MainContent: FC<MainContentProps> = ({
   showScrollTop,
   setShowScrollTop,
 }) => {
-  // Create a ref for the top marker (for intersection observer)
-  const topMarkerRef = useRef<HTMLDivElement>(null);
-
-  // Use IntersectionObserver to detect when we've scrolled past the top
-  useEffect(() => {
+  const handleScroll = () => {
     // Only set up on mobile and not on 2xl screens
     const isMobile = window.innerWidth < 768;
     const is2XL = window.innerWidth >= 1536;
-    if (is2XL || !isMobile || !topMarkerRef.current) return;
+    if (is2XL || !isMobile) return;
 
-    const options = {
-      root: null, // Use the viewport as the root
-      threshold: 0,
-      rootMargin: "-100px 0px 0px 0px", // Consider it "out of view" when 100px down
-    };
+    const scrollPosition = window.scrollY;
+    setShowScrollTop(scrollPosition > 1200);
+  };
 
-    const observer = new IntersectionObserver((entries) => {
-      // When topMarker is not intersecting, we've scrolled down
-      const [entry] = entries;
-      setShowScrollTop(!entry.isIntersecting);
-    }, options);
-
-    observer.observe(topMarkerRef.current);
-
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      if (topMarkerRef.current) {
-        observer.unobserve(topMarkerRef.current);
-      }
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [setShowScrollTop]);
 
@@ -248,9 +234,6 @@ const MainContent: FC<MainContentProps> = ({
 
       {/* For mobile and other screens: Regular post grid view */}
       <div className="w-full 2xl:hidden p-4 md:p-8 overflow-hidden">
-        {/* Intersection observer marker at the top */}
-        <div ref={topMarkerRef} className="absolute top-0 h-1 w-full" />
-
         {/* Subreddit title, sort options, and refresh button - visible only on desktop (not 2xl) */}
         <div className="hidden md:flex 2xl:hidden items-center mb-6 gap-2">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
