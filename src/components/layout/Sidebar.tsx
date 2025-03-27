@@ -87,8 +87,8 @@ const Sidebar = ({
   };
 
   return (
-    <aside className="w-full h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white overflow-y-auto flex flex-col border-r border-gray-200 dark:border-gray-700">
-      <div className="hidden sm:block p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+    <aside className="w-full h-full px-6 sm:px-0 bg-white dark:bg-gray-800 text-gray-800 dark:text-white overflow-y-auto flex flex-col border-r border-gray-200 dark:border-gray-700">
+      <div className="hidden sm:block p-4 border-b border-gray-200 dark:border-gray-700 items-center justify-between">
         <h1 className="text-xl font-bold flex items-center">
           <span className="text-orange-500 mr-1">B</span>readdit
         </h1>
@@ -130,7 +130,7 @@ const Sidebar = ({
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="mb-6">
-          <h2 className="text-2xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
+          <h2 className="text-3xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 mr-2"
@@ -161,7 +161,7 @@ const Sidebar = ({
                 aria-pressed={selectedSubreddit === subreddit}
               >
                 <div className="flex items-center">
-                  <span className="text-2xl md:text-sm font-medium">
+                  <span className="text-3xl md:text-sm font-medium">
                     r/{subreddit}
                   </span>
                 </div>
@@ -172,7 +172,7 @@ const Sidebar = ({
 
         {mySubreddits.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-2xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
+            <h2 className="text-3xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 mr-2"
@@ -203,7 +203,7 @@ const Sidebar = ({
                   aria-pressed={selectedSubreddit === subreddit}
                 >
                   <div className="flex items-center">
-                    <span className="text-2xl md:text-sm font-medium">
+                    <span className="text-3xl md:text-sm font-medium">
                       r/{subreddit}
                     </span>
                   </div>

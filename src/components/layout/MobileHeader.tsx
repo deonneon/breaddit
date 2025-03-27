@@ -133,7 +133,7 @@ const MobileHeader: FC<MobileHeaderProps> = ({
 
       {/* Mobile Sidebar - fixed position with custom viewport height */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 top-0 z-20 w-2/3 h-[calc(100*var(--vh,1vh))] overflow-hidden">
+        <div className="md:hidden fixed inset-0 top-0 z-20 w-3/4 h-[calc(100*var(--vh,1vh))] overflow-hidden">
           <Sidebar
             subreddits={subreddits}
             selectedSubreddit={subreddit}
