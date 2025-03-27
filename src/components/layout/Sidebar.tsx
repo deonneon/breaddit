@@ -130,7 +130,7 @@ const Sidebar = ({
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="mb-6">
-          <h2 className="text-lg md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
+          <h2 className="text-2xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 mr-2"
@@ -145,7 +145,7 @@ const Sidebar = ({
                 d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
               />
             </svg>
-            Default Subreddits
+            Default
           </h2>
           <div className="space-y-2">
             {subreddits.map((subreddit) => (
@@ -161,7 +161,7 @@ const Sidebar = ({
                 aria-pressed={selectedSubreddit === subreddit}
               >
                 <div className="flex items-center">
-                  <span className="text-lg md:text-sm font-medium">
+                  <span className="text-2xl md:text-sm font-medium">
                     r/{subreddit}
                   </span>
                 </div>
@@ -172,7 +172,7 @@ const Sidebar = ({
 
         {mySubreddits.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
+            <h2 className="text-2xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 mr-2"
@@ -203,7 +203,7 @@ const Sidebar = ({
                   aria-pressed={selectedSubreddit === subreddit}
                 >
                   <div className="flex items-center">
-                    <span className="text-lg md:text-sm font-medium">
+                    <span className="text-2xl md:text-sm font-medium">
                       r/{subreddit}
                     </span>
                   </div>
@@ -216,7 +216,7 @@ const Sidebar = ({
 
       <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <div className="text-sm md:text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-md md:text-xs text-gray-500 dark:text-gray-400">
             <p>Reddit Reader</p>
           </div>
           <ThemeToggle />
