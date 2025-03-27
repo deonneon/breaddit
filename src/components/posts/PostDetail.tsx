@@ -91,19 +91,16 @@ const PostDetail: FC<PostDetailProps> = ({
     }
   }, [post.comments, localMarkSeen, processCommentsWithNewFlags]);
 
-  // When seenComments or post changes, check if we should mark as unseen
   useEffect(() => {
-    // If there are comments but this is our first time seeing the post,
-    // we should automatically mark all comments as seen
     if (isFirstTimeSeenPost && post.comments?.length > 0) {
       handleMarkAllSeen();
     }
+  }, [isFirstTimeSeenPost, post.comments, handleMarkAllSeen]);
 
-    // Reset local mark seen when the post changes
-    if (post.permalink) {
-      setLocalMarkSeen(false);
-    }
-  }, [isFirstTimeSeenPost, post.comments, post.permalink, handleMarkAllSeen]);
+  // Reset localMarkSeen only when post.permalink changes
+  useEffect(() => {
+    setLocalMarkSeen(false);
+  }, [post.permalink]);
 
   // Handle opening the new comments modal
   const handleOpenNewCommentsModal = (e: React.MouseEvent) => {
