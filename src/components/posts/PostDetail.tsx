@@ -1,9 +1,9 @@
-import { FC, useState, useCallback, useEffect } from 'react';
-import type { RedditPost, RedditComment } from '../../services/redditService';
-import Comment from './Comment';
-import { formatDate } from '../../utils/formatters';
-import { renderMarkdown } from '../../utils/markdownUtils';
-import NewCommentsModal from '../modals/NewCommentsModal';
+import { FC, useState, useCallback, useEffect } from "react";
+import type { RedditPost, RedditComment } from "../../services/redditService";
+import Comment from "./Comment";
+import { formatDate } from "../../utils/formatters";
+import { renderMarkdown } from "../../utils/markdownUtils";
+import NewCommentsModal from "../modals/NewCommentsModal";
 
 interface PostDetailProps {
   post: RedditPost;
@@ -16,60 +16,75 @@ interface PostDetailProps {
   markAllCommentsAsSeen: (permalink: string, comments: RedditComment[]) => void;
 }
 
-const PostDetail: FC<PostDetailProps> = ({ 
-  post, 
+const PostDetail: FC<PostDetailProps> = ({
+  post,
   seenComments,
-  markAllCommentsAsSeen
+  markAllCommentsAsSeen,
 }) => {
   // Add state for new comments modal
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
   // Add local state to track if comments were manually marked as seen
   const [localMarkSeen, setLocalMarkSeen] = useState(false);
   // Add state to store the processed comments
-  const [processedComments, setProcessedComments] = useState<RedditComment[]>([]);
+  const [processedComments, setProcessedComments] = useState<RedditComment[]>(
+    []
+  );
 
   // Process comments recursively to handle 'isNew' flags
-  const processCommentsWithNewFlags = useCallback((comments: RedditComment[], markAsSeen: boolean): RedditComment[] => {
-    return comments.map(comment => {
-      const processedReplies: RedditComment[] = comment.replies 
-        ? processCommentsWithNewFlags(comment.replies, markAsSeen) 
-        : [];
-      
-      return {
-        ...comment,
-        isNew: markAsSeen ? false : comment.isNew,
-        replies: processedReplies
-      };
-    });
-  }, []);
+  const processCommentsWithNewFlags = useCallback(
+    (comments: RedditComment[], markAsSeen: boolean): RedditComment[] => {
+      return comments.map((comment) => {
+        const processedReplies: RedditComment[] = comment.replies
+          ? processCommentsWithNewFlags(comment.replies, markAsSeen)
+          : [];
+
+        return {
+          ...comment,
+          isNew: markAsSeen ? false : comment.isNew,
+          replies: processedReplies,
+        };
+      });
+    },
+    []
+  );
 
   // Function to manually mark all comments as seen immediately
   const handleMarkAllSeen = useCallback(() => {
     // Use commentsToRender which includes all processed comments
-    const commentsToMark = processedComments.length > 0 ? processedComments : post.comments;
-    
-    // Call the parent function to update localStorage
-    markAllCommentsAsSeen(post.permalink, commentsToMark);
-    
-    // Update local state to force UI refresh
-    setLocalMarkSeen(true);
-    
-    // Process all comments to remove isNew flags
+    const commentsToMark =
+      processedComments.length > 0 ? processedComments : post.comments;
+
+    // First process the comments
     const updatedComments = processCommentsWithNewFlags(commentsToMark, true);
+
+    // Update both states together
     setProcessedComments(updatedComments);
-  }, [post.permalink, post.comments, processedComments, markAllCommentsAsSeen, processCommentsWithNewFlags]);
+    setLocalMarkSeen(true);
+
+    // Finally update localStorage
+    markAllCommentsAsSeen(post.permalink, updatedComments);
+  }, [
+    post.permalink,
+    post.comments,
+    processedComments,
+    markAllCommentsAsSeen,
+    processCommentsWithNewFlags,
+  ]);
 
   // Check if this is the first time seeing this post/thread
   const isFirstTimeSeenPost = !seenComments[post.permalink];
 
   // Get the count of new comments for the post, respecting local marked state
-  const newCommentsCount = localMarkSeen ? 0 : (post._newCommentsCount || 0);
+  const newCommentsCount = localMarkSeen ? 0 : post._newCommentsCount || 0;
 
   // When post changes, process comments
   useEffect(() => {
     if (post.comments?.length > 0) {
       // Process comments with their current isNew state
-      const updatedComments = processCommentsWithNewFlags(post.comments, localMarkSeen);
+      const updatedComments = processCommentsWithNewFlags(
+        post.comments,
+        localMarkSeen
+      );
       setProcessedComments(updatedComments);
     } else {
       setProcessedComments([]);
@@ -83,7 +98,7 @@ const PostDetail: FC<PostDetailProps> = ({
     if (isFirstTimeSeenPost && post.comments?.length > 0) {
       handleMarkAllSeen();
     }
-    
+
     // Reset local mark seen when the post changes
     if (post.permalink) {
       setLocalMarkSeen(false);
@@ -109,10 +124,11 @@ const PostDetail: FC<PostDetailProps> = ({
   };
 
   // Use the processed comments instead of post.comments
-  const commentsToRender = processedComments.length > 0 ? processedComments : post.comments;
+  const commentsToRender =
+    processedComments.length > 0 ? processedComments : post.comments;
 
   return (
-    <div 
+    <div
       key={post.permalink}
       className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden"
     >
@@ -208,10 +224,7 @@ const PostDetail: FC<PostDetailProps> = ({
           ) : (
             <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex justify-center overflow-hidden">
               <img
-                src={
-                  post.url_overridden_by_dest ||
-                  post.url
-                }
+                src={post.url_overridden_by_dest || post.url}
                 alt={post.title}
                 className="max-w-full h-auto rounded-md object-contain"
                 loading="lazy"
@@ -313,4 +326,4 @@ const PostDetail: FC<PostDetailProps> = ({
   );
 };
 
-export default PostDetail; 
+export default PostDetail;
