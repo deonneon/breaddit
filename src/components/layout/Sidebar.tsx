@@ -94,7 +94,7 @@ const Sidebar = ({
         </h1>
       </div>
 
-      <div className="px-4 mt-20 md:my-4">
+      <div className="py-3 mt-20 md:my-4">
         <div className="relative mb-6">
           <input
             type="text"
@@ -155,7 +155,7 @@ const Sidebar = ({
                 className={`w-full px-4 py-2 rounded-lg text-left transition-all duration-200 ${
                   selectedSubreddit === subreddit
                     ? "bg-orange-500 text-white shadow-sm"
-                    : "bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                    : "bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 }`}
                 aria-label={`Select ${subreddit} subreddit`}
                 aria-pressed={selectedSubreddit === subreddit}
@@ -197,7 +197,7 @@ const Sidebar = ({
                   className={`w-full px-4 py-2 rounded-lg text-left transition-all duration-200 ${
                     selectedSubreddit === subreddit
                       ? "bg-orange-500 text-white shadow-sm"
-                      : "bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                      : "bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-500 dark:text-white dark:hover:bg-gray-700"
                   }`}
                   aria-label={`Select ${subreddit} subreddit`}
                   aria-pressed={selectedSubreddit === subreddit}

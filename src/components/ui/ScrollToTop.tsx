@@ -10,7 +10,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
     <button
       onClick={onClick}
       className={`
-        fixed bottom-40 right-2 z-10
+        fixed bottom-20 left-2 z-10
         md:bottom-8 md:right-8
         ${
           show
