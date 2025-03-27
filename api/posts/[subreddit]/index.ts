@@ -1,7 +1,6 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
-import snoowrap from 'snoowrap';
-import * as dotenv from 'dotenv';
-
+import { VercelRequest, VercelResponse } from "@vercel/node";
+import snoowrap from "snoowrap";
+import * as dotenv from "dotenv";
 
 // Configure dotenv for ES modules
 dotenv.config();
@@ -24,8 +23,14 @@ interface Comment {
   depth: number;
 }
 
+// Define additional properties for Reddit submissions
+interface RedditSubmissionExtras {
+  url_overridden_by_dest?: string;
+  post_hint?: string;
+}
+
 // Define valid sort types
-type SortType = 'hot' | 'new';
+type SortType = "hot" | "new";
 
 /**
  * Recursively structure a comment and its replies.
@@ -50,12 +55,16 @@ async function fetchComments(comment: snoowrap.Comment): Promise<Comment> {
 /**
  * Fetch posts and their comments from a given subreddit.
  */
-async function fetchSubredditData(subredditName: string, limit: number = 4, sort: SortType = 'hot') {
+async function fetchSubredditData(
+  subredditName: string,
+  limit: number = 4,
+  sort: SortType = "hot"
+) {
   const subreddit = reddit.getSubreddit(subredditName);
-  
+
   // Fetch posts based on the sort parameter
   let submissions;
-  if (sort === 'new') {
+  if (sort === "new") {
     submissions = await subreddit.getNew({ limit });
   } else {
     // Default to hot
@@ -64,6 +73,10 @@ async function fetchSubredditData(subredditName: string, limit: number = 4, sort
 
   const postsData = await Promise.all(
     submissions.map(async (submission) => {
+      // Cast submission to include additional properties
+      const extendedSubmission = submission as snoowrap.Submission &
+        RedditSubmissionExtras;
+
       // Fetch all top-level comments (expanding "more comments")
       const commentsListing = await submission.comments.fetchMore({
         amount: Infinity,
@@ -83,10 +96,10 @@ async function fetchSubredditData(subredditName: string, limit: number = 4, sort
         selftext: submission.selftext,
         url: submission.url,
         thumbnail: submission.thumbnail,
-        url_overridden_by_dest: (submission as any).url_overridden_by_dest,
+        url_overridden_by_dest: extendedSubmission.url_overridden_by_dest,
         is_self: submission.is_self,
         is_video: submission.is_video,
-        post_hint: (submission as any).post_hint,
+        post_hint: extendedSubmission.post_hint,
         comments,
       };
     })
@@ -96,42 +109,43 @@ async function fetchSubredditData(subredditName: string, limit: number = 4, sort
 }
 
 // Vercel serverless function handler
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   // Allow requests from the same domain and localhost for development
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   // Handle OPTIONS request (preflight)
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
   // Only allow GET requests
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { subreddit } = req.query;
-  
-  if (!subreddit || typeof subreddit !== 'string') {
-    return res.status(400).json({ error: 'Subreddit parameter is required' });
+
+  if (!subreddit || typeof subreddit !== "string") {
+    return res.status(400).json({ error: "Subreddit parameter is required" });
   }
 
   // Parse the limit parameter if provided, otherwise use default
-  const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
-  
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
   // Get sort parameter with default to 'hot'
-  const sort = (req.query.sort as SortType) || 'hot';
-  
+  const sort = (req.query.sort as SortType) || "hot";
+
   // Validate sort parameter
-  if (sort !== 'hot' && sort !== 'new') {
-    return res.status(400).json({ error: "Sort parameter must be either 'hot' or 'new'" });
+  if (sort !== "hot" && sort !== "new") {
+    return res
+      .status(400)
+      .json({ error: "Sort parameter must be either 'hot' or 'new'" });
   }
 
   try {
@@ -141,4 +155,4 @@ export default async function handler(
     console.error("Error fetching subreddit data:", error);
     return res.status(500).json({ error: "Error fetching subreddit data" });
   }
-} 
+}

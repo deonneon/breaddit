@@ -5,6 +5,7 @@ import MobileHeader from "./components/layout/MobileHeader";
 import { useSubredditPosts } from "./hooks/useSubredditPosts";
 import { useComments } from "./hooks/useComments";
 import { useUISettings, FontSize } from "./hooks/useUISettings";
+import { useEffect } from "react";
 
 // Default subreddits that are always available
 const DEFAULT_SUBREDDITS = [
@@ -55,9 +56,27 @@ const App = () => {
     setSidebarOpen(false);
   };
 
+  // Set CSS variables for viewport height to handle mobile browsers
+  useEffect(() => {
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    // Set the height initially
+    setViewportHeight();
+
+    // Update the height on resize
+    window.addEventListener("resize", setViewportHeight);
+
+    return () => {
+      window.removeEventListener("resize", setViewportHeight);
+    };
+  }, []);
+
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-screen h-full`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-[calc(100*var(--vh,1vh))] h-[calc(100*var(--vh,1vh))]`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
@@ -77,7 +96,7 @@ const App = () => {
       />
 
       {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden md:block md:h-screen w-64 md:flex-shrink-0">
+      <div className="hidden md:block md:h-[calc(100*var(--vh,1vh))] w-64 md:flex-shrink-0">
         <Sidebar
           subreddits={DEFAULT_SUBREDDITS}
           selectedSubreddit={subreddit}
@@ -99,7 +118,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 h-screen md:h-screen">
+      <main className="flex-1 h-[calc(100*var(--vh,1vh))] md:h-[calc(100*var(--vh,1vh))]">
         <MainContent
           posts={posts}
           loading={loading}
