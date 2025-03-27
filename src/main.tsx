@@ -11,8 +11,11 @@ const isDarkMode =
 
 document.documentElement.classList.toggle("dark", isDarkMode);
 
-// We no longer need to update the theme-color meta tag here
-// as we're using media queries in the HTML directly
+// Update the theme-color meta tag
+const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+if (metaThemeColor) {
+  metaThemeColor.setAttribute("content", isDarkMode ? "#1f2937" : "#ffffff");
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
