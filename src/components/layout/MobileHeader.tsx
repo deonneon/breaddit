@@ -1,7 +1,7 @@
-import { FC, useEffect, useState } from 'react';
-import type { SortType } from '../../services/redditService';
-import type { FontSize } from '../../hooks/useUISettings';
-import Sidebar from './Sidebar';
+import { FC, useEffect, useState } from "react";
+import type { SortType } from "../../services/redditService";
+import type { FontSize } from "../../hooks/useUISettings";
+import Sidebar from "./Sidebar";
 
 interface MobileHeaderProps {
   subreddit: string;
@@ -33,22 +33,26 @@ const MobileHeader: FC<MobileHeaderProps> = ({
   updateFontSize,
   subreddits,
   onSubredditSelect,
-  sidebarOpen
+  sidebarOpen,
 }) => {
   const [sidebarHeight, setSidebarHeight] = useState<number>(0);
 
   useEffect(() => {
     const calculateSidebarHeight = () => {
       const headerHeight = 64; // Adjust this if the header height changes
-      const usableHeight = window.innerHeight - headerHeight;
+      // Use the custom variable to get the actual viewport height
+      const vh = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--vh")
+      );
+      const usableHeight = vh * 100 - headerHeight; // vh is in units of 1% of viewport height
       setSidebarHeight(usableHeight);
     };
 
     calculateSidebarHeight();
-    window.addEventListener('resize', calculateSidebarHeight);
-    
+    window.addEventListener("resize", calculateSidebarHeight);
+
     return () => {
-      window.removeEventListener('resize', calculateSidebarHeight);
+      window.removeEventListener("resize", calculateSidebarHeight);
     };
   }, []);
 
@@ -110,22 +114,22 @@ const MobileHeader: FC<MobileHeaderProps> = ({
         {/* Mobile sort toggle */}
         <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
           <button
-            onClick={() => updateSort('hot')}
+            onClick={() => updateSort("hot")}
             className={`px-4 py-1 text-xs ${
-              currentSort === 'hot'
-                ? 'bg-orange-500 text-white'
-                : 'text-gray-700 dark:text-gray-300'
+              currentSort === "hot"
+                ? "bg-orange-500 text-white"
+                : "text-gray-700 dark:text-gray-300"
             }`}
             aria-label="Sort by hot"
           >
             Hot
           </button>
           <button
-            onClick={() => updateSort('new')}
+            onClick={() => updateSort("new")}
             className={`px-4 py-1 text-xs ${
-              currentSort === 'new'
-                ? 'bg-orange-500 text-white'
-                : 'text-gray-700 dark:text-gray-300'
+              currentSort === "new"
+                ? "bg-orange-500 text-white"
+                : "text-gray-700 dark:text-gray-300"
             }`}
             aria-label="Sort by new"
           >
@@ -136,7 +140,10 @@ const MobileHeader: FC<MobileHeaderProps> = ({
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-20 w-64" style={{ height: sidebarHeight }}>
+        <div
+          className="md:hidden fixed inset-0 top-16 z-20 w-64"
+          style={{ height: `${sidebarHeight}px` }}
+        >
           <Sidebar
             subreddits={subreddits}
             selectedSubreddit={subreddit}
@@ -153,4 +160,4 @@ const MobileHeader: FC<MobileHeaderProps> = ({
   );
 };
 
-export default MobileHeader; 
+export default MobileHeader;

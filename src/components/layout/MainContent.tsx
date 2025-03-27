@@ -82,7 +82,7 @@ const MainContent: FC<MainContentProps> = ({
 
   if (loading) {
     return (
-      <div className="w-full h-full min-h-screen flex items-center justify-center">
+      <div className="w-full h-full min-h-[calc(100*var(--vh,1vh))] flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -90,7 +90,7 @@ const MainContent: FC<MainContentProps> = ({
 
   if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-[calc(100*var(--vh,1vh))] flex items-center justify-center">
         <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-lg shadow-sm">
           <div className="flex items-center">
             <svg
@@ -116,7 +116,7 @@ const MainContent: FC<MainContentProps> = ({
 
   if (posts.length === 0) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-[calc(100*var(--vh,1vh))] flex items-center justify-center">
         <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-4 rounded-lg shadow-sm">
           <div className="flex items-center">
             <svg
@@ -144,7 +144,7 @@ const MainContent: FC<MainContentProps> = ({
   return (
     <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900">
       {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
-      <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-screen 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
+      <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-[calc(100*var(--vh,1vh))] 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
         {/* Subreddit title and refresh button */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -297,7 +297,7 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For 2xl screens: Right scrollable post detail content */}
-      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-screen 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
+      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
         {selectedPostIndex < posts.length && (
           <PostDetail
             post={posts[selectedPostIndex]}
