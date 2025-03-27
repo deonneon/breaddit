@@ -1,9 +1,9 @@
-import { FC, useRef, useEffect } from 'react';
-import PostCard from '../posts/PostCard';
-import PostDetail from '../posts/PostDetail';
-import LoadingSpinner from '../ui/LoadingSpinner';
-import ScrollToTop from '../ui/ScrollToTop';
-import type { RedditPost } from '../../services/redditService';
+import { FC, useRef, useEffect } from "react";
+import PostCard from "../posts/PostCard";
+import PostDetail from "../posts/PostDetail";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ScrollToTop from "../ui/ScrollToTop";
+import type { RedditPost, RedditComment } from "../../services/redditService";
 
 interface MainContentProps {
   posts: RedditPost[];
@@ -15,8 +15,13 @@ interface MainContentProps {
   readPosts: Record<string, number>;
   markPostAsRead: (postId: string) => void;
   refreshPosts: () => void;
-  seenComments: any;
-  markAllCommentsAsSeen: any;
+  seenComments: {
+    [postPermalink: string]: {
+      commentIds: string[];
+      lastFetchTime: number;
+    };
+  };
+  markAllCommentsAsSeen: (permalink: string, comments: RedditComment[]) => void;
   showScrollTop: boolean;
   setShowScrollTop: (show: boolean) => void;
 }
@@ -46,7 +51,7 @@ const MainContent: FC<MainContentProps> = ({
     // Only set up on mobile and not on 2xl screens
     const isMobile = window.innerWidth < 768;
     const is2XL = window.innerWidth >= 1536;
-    if ((is2XL || !isMobile) || !topMarkerRef.current) return;
+    if (is2XL || !isMobile || !topMarkerRef.current) return;
 
     const options = {
       root: scrollContainerRef.current,
@@ -177,11 +182,11 @@ const MainContent: FC<MainContentProps> = ({
         {/* Post listing in traditional sidebar style */}
         <div className="flex-1 overflow-y-auto px-2">
           {posts.map((post, index) => (
-            <div 
+            <div
               key={post.permalink}
               className={`py-3 px-2 border-b border-gray-100 dark:border-gray-800 last:border-0 ${
-                selectedPostIndex === index 
-                  ? "bg-orange-50 dark:bg-orange-900/20" 
+                selectedPostIndex === index
+                  ? "bg-orange-50 dark:bg-orange-900/20"
                   : ""
               }`}
             >
@@ -195,19 +200,28 @@ const MainContent: FC<MainContentProps> = ({
                     ? "text-orange-600 dark:text-orange-400"
                     : "text-gray-800 dark:text-gray-200"
                 }`}
-                aria-label={`Select post "${post.title}${post.isNewlyFetched && !readPosts[post.permalink] ? " (New)" : ""}`}
+                aria-label={`Select post "${post.title}${
+                  post.isNewlyFetched && !readPosts[post.permalink]
+                    ? " (New)"
+                    : ""
+                }`}
               >
                 <div className="flex items-start">
                   {/* New post indicator */}
                   {post.isNewlyFetched && !readPosts[post.permalink] && (
-                    <span className="flex-shrink-0 h-2 w-2 mt-1.5 mr-2 bg-green-500 rounded-full" aria-label="New post"></span>
+                    <span
+                      className="flex-shrink-0 h-2 w-2 mt-1.5 mr-2 bg-green-500 rounded-full"
+                      aria-label="New post"
+                    ></span>
                   )}
                   <div className="flex-1">
-                    <h3 className={`text-sm font-medium mb-1 line-clamp-2 ${
-                      selectedPostIndex === index
-                        ? "text-orange-600 dark:text-orange-400"
-                        : "text-gray-800 dark:text-gray-200"
-                    }`}>
+                    <h3
+                      className={`text-sm font-medium mb-1 line-clamp-2 ${
+                        selectedPostIndex === index
+                          ? "text-orange-600 dark:text-orange-400"
+                          : "text-gray-800 dark:text-gray-200"
+                      }`}
+                    >
                       {post.title}
                     </h3>
                     <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
@@ -303,4 +317,4 @@ const MainContent: FC<MainContentProps> = ({
   );
 };
 
-export default MainContent; 
+export default MainContent;
