@@ -32,7 +32,7 @@ const ThemeToggle = ({ compact = false }: ThemeToggleProps) => {
       <div className="flex items-center rounded-lg border border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setTheme("light")}
-          className={`py-2 md:p-1.5  transition-all ${
+          className={`p-0 md:p-1.5  transition-all ${
             effectiveTheme === "light"
               ? "bg-white text-black"
               : "text-gray-600 dark:text-gray-400"
@@ -53,7 +53,7 @@ const ThemeToggle = ({ compact = false }: ThemeToggleProps) => {
 
         <button
           onClick={() => setTheme("dark")}
-          className={`p-1.5 transition-all ${
+          className={`p-0 md:p-1.5 transition-all ${
             effectiveTheme === "dark"
               ? "bg-gray-700 text-white"
               : "text-gray-600 dark:text-gray-400"

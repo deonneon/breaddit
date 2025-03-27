@@ -94,7 +94,7 @@ const Sidebar = ({
         </h1>
       </div>
 
-      <div className="px-4 mt-6 md:my-4">
+      <div className="px-4 mt-20 md:my-4">
         <div className="relative mb-6">
           <input
             type="text"
@@ -214,7 +214,7 @@ const Sidebar = ({
         )}
       </div>
 
-      <div className="p-2 px-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="text-sm md:text-xs text-gray-500 dark:text-gray-400">
             <p>Reddit Reader</p>

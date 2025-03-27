@@ -10,7 +10,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
     <button
       onClick={onClick}
       className={`
-        fixed bottom-40 right-4 z-10
+        fixed bottom-40 right-3 z-10
         md:bottom-8 md:right-8
         ${
           show
@@ -26,7 +26,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6 md:h-5 md:w-5"
+        className="h-4 w-4 md:h-5 md:w-5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
