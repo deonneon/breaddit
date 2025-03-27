@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC } from "react";
 
 interface ScrollToTopProps {
   show: boolean;
@@ -10,16 +10,16 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
     <button
       onClick={onClick}
       className={`
-        fixed bottom-4 right-7 z-50
-        md:hidden
+        fixed bottom-6 right-4 z-50
+        md:bottom-8 md:right-8
         ${
           show
-            ? "opacity-70 scale-100"
+            ? "opacity-90 scale-100"
             : "opacity-0 scale-95 pointer-events-none"
         }
-        bg-gray-800/70 hover:bg-gray-700 text-white
-        rounded-full p-2 shadow-md backdrop-blur-sm
-        transition-all duration-200
+        bg-orange-500/80 hover:bg-orange-600/90 text-white
+        rounded-full p-3 shadow-lg backdrop-blur-sm
+        transition-all duration-200 border border-white/10
       `}
       aria-label="Scroll to top"
       title="Back to top"
@@ -42,4 +42,4 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
   );
 };
 
-export default ScrollToTop; 
+export default ScrollToTop;

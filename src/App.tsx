@@ -76,7 +76,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-[calc(100*var(--vh,1vh))] h-[calc(100*var(--vh,1vh))]`}
+      className={`flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 min-h-[calc(100*var(--vh,1vh))] h-auto overflow-x-hidden`}
     >
       {/* Mobile Header with Hamburger and Sidebar */}
       <MobileHeader
@@ -118,7 +118,7 @@ const App = () => {
         />
       )}
 
-      <main className="flex-1 h-full">
+      <main className="flex-1 h-auto min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))]">
         <MainContent
           posts={posts}
           loading={loading}

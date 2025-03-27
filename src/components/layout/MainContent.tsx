@@ -52,9 +52,9 @@ const MainContent: FC<MainContentProps> = ({
     if (is2XL || !isMobile || !topMarkerRef.current) return;
 
     const options = {
-      root: null, // Use the viewport as the root instead of a specific container
+      root: null, // Use the viewport as the root
       threshold: 0,
-      rootMargin: "-200px 0px 0px 0px", // Consider it "out of view" when 200px down
+      rootMargin: "-100px 0px 0px 0px", // Consider it "out of view" when 100px down
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -74,9 +74,20 @@ const MainContent: FC<MainContentProps> = ({
 
   // Function to scroll to top
   const scrollToTop = () => {
-    // Use documentElement for better Safari compatibility
-    const scrollElement = document.documentElement;
-    scrollElement.scrollTo({
+    // Scroll both window and document element for maximum compatibility
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    // Also scroll document element for Safari
+    document.documentElement.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    // And scroll body for older browsers
+    document.body.scrollTo({
       top: 0,
       behavior: "smooth",
     });
