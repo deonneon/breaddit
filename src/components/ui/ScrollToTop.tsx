@@ -17,9 +17,9 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
             ? "opacity-90 scale-100"
             : "opacity-0 scale-95 pointer-events-none"
         }
-       hover:bg-orange-600/90 text-white
-        rounded-lg p-2 shadow-lg backdrop-blur-sm
-        transition-all duration-200 border border-white/10
+       hover:bg-orange-600/90 text-gray-300
+        rounded-lg p-2 shadow-xl backdrop-blur-md
+        transition-all duration-200 border border-white/20
       `}
       aria-label="Scroll to top"
       title="Back to top"
