@@ -22,12 +22,12 @@ const CACHE_DURATION = 5 * 60 * 1000;
 // Default post limits by subreddit
 const DEFAULT_SUBREDDIT_POST_LIMITS: Record<string, number> = {
   'thewallstreet': 3,
-  'stocks': 10,
-  'wallstreetbets': 10,
-  'singularity': 10,
-  'localllama': 10,
+  'stocks': 6,
+  'wallstreetbets': 6,
+  'singularity': 6,
+  'localllama': 6,
   // Default for other subreddits
-  'default': 10
+  'default': 6
 };
 
 export const useSubredditPosts = (initialSubreddit: string) => {

@@ -1,6 +1,6 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useRef } from "react";
 import PostCard from "../posts/PostCard";
-import PostDetail from "../posts/PostDetail";
+import PostDetail, { PostDetailHandle } from "../posts/PostDetail";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ScrollToTop from "../ui/ScrollToTop";
 import MarkAllSeen from "../ui/MarkAllSeen";
@@ -42,6 +42,10 @@ const MainContent: FC<MainContentProps> = ({
   showScrollTop,
   setShowScrollTop,
 }) => {
+  // Create refs for both mobile and desktop post detail components
+  const mobilePostDetailRef = useRef<PostDetailHandle>(null);
+  const desktopPostDetailRef = useRef<PostDetailHandle>(null);
+  
   const handleScroll = () => {
     // Only set up on mobile and not on 2xl screens
     const isMobile = window.innerWidth < 768;
@@ -80,14 +84,14 @@ const MainContent: FC<MainContentProps> = ({
     });
   };
 
-  // Function to mark all posts as seen
-  const handleMarkAllSeen = () => {
-    posts.forEach((post) => {
-      markPostAsRead(post.permalink);
-      if (post.comments) {
-        markAllCommentsAsSeen(post.permalink, post.comments);
-      }
-    });
+  // Function to handle mark all seen via PostDetail ref
+  const handleMarkCurrentPostCommentsSeen = () => {
+    // Call the appropriate ref's method based on screen size
+    if (window.innerWidth >= 1536) {
+      desktopPostDetailRef.current?.markAllCommentsSeen();
+    } else {
+      mobilePostDetailRef.current?.markAllCommentsSeen();
+    }
   };
 
   if (loading) {
@@ -343,6 +347,7 @@ const MainContent: FC<MainContentProps> = ({
         <div className="space-y-8 pb-16 w-full max-w-full">
           {selectedPostIndex < posts.length && (
             <PostDetail
+              ref={mobilePostDetailRef}
               key={`post-detail-${posts[selectedPostIndex].permalink}-${selectedPostIndex}`}
               post={posts[selectedPostIndex]}
               seenComments={seenComments}
@@ -351,8 +356,10 @@ const MainContent: FC<MainContentProps> = ({
           )}
         </div>
 
-        {/* Mark all seen button */}
-        <MarkAllSeen onClick={handleMarkAllSeen} />
+        {/* Mark all seen button - show only when a post is selected */}
+        {selectedPostIndex < posts.length && (
+          <MarkAllSeen onClick={handleMarkCurrentPostCommentsSeen} />
+        )}
 
         {/* Scroll to top button */}
         <ScrollToTop show={showScrollTop} onClick={scrollToTop} />
@@ -362,11 +369,19 @@ const MainContent: FC<MainContentProps> = ({
       <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
         {selectedPostIndex < posts.length && (
           <PostDetail
+            ref={desktopPostDetailRef}
             key={`post-detail-${posts[selectedPostIndex].permalink}-${selectedPostIndex}`}
             post={posts[selectedPostIndex]}
             seenComments={seenComments}
             markAllCommentsAsSeen={markAllCommentsAsSeen}
           />
+        )}
+        
+        {/* Mark all seen button for 2xl screens */}
+        {selectedPostIndex < posts.length && (
+          <div className="2xl:block hidden">
+            <MarkAllSeen onClick={handleMarkCurrentPostCommentsSeen} />
+          </div>
         )}
       </div>
     </div>

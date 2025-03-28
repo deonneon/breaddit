@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useEffect } from "react";
+import { FC, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from "react";
 import type { RedditPost, RedditComment } from "../../services/redditService";
 import Comment from "./Comment";
 import { formatDate } from "../../utils/formatters";
@@ -16,11 +16,15 @@ interface PostDetailProps {
   markAllCommentsAsSeen: (permalink: string, comments: RedditComment[]) => void;
 }
 
-const PostDetail: FC<PostDetailProps> = ({
+export interface PostDetailHandle {
+  markAllCommentsSeen: () => void;
+}
+
+const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
   post,
   seenComments,
   markAllCommentsAsSeen,
-}) => {
+}, ref) => {
   // Add state for new comments modal
   const [showNewCommentsModal, setShowNewCommentsModal] = useState(false);
   // Add local state to track if comments were manually marked as seen
@@ -70,6 +74,11 @@ const PostDetail: FC<PostDetailProps> = ({
     markAllCommentsAsSeen,
     processCommentsWithNewFlags,
   ]);
+
+  // Expose the markAllCommentsSeen method to parent components
+  useImperativeHandle(ref, () => ({
+    markAllCommentsSeen: handleMarkAllSeen
+  }), [handleMarkAllSeen]);
 
   // Check if this is the first time seeing this post/thread
   const isFirstTimeSeenPost = !seenComments[post.permalink];
@@ -294,7 +303,6 @@ const PostDetail: FC<PostDetailProps> = ({
               aria-label="Mark all comments as seen"
               tabIndex={0}
             >
-              <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mr-1.5"></span>
               Mark all seen
             </button>
           )}
@@ -324,6 +332,6 @@ const PostDetail: FC<PostDetailProps> = ({
       />
     </div>
   );
-};
+});
 
 export default PostDetail;
