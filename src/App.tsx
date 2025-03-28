@@ -17,6 +17,18 @@ const DEFAULT_SUBREDDITS = [
 ];
 
 const App = () => {
+  // Get initial subreddit from URL if available
+  const getInitialSubreddit = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const subredditParam = params.get('subreddit');
+      return subredditParam && DEFAULT_SUBREDDITS.includes(subredditParam) 
+        ? subredditParam 
+        : "thewallstreet";
+    }
+    return "thewallstreet";
+  };
+  
   // Get UI settings from hook
   const {
     fontSize,
@@ -31,7 +43,7 @@ const App = () => {
   // Get comments functionality from hook
   const { seenComments, markAllCommentsAsSeen } = useComments();
 
-  // Get subreddit posts functionality from hook
+  // Get subreddit posts functionality from hook with initial subreddit from URL
   const {
     posts,
     loading,
@@ -48,7 +60,7 @@ const App = () => {
     updateCurrentSortPreference,
     sortPreferences,
     refreshPosts,
-  } = useSubredditPosts("thewallstreet");
+  } = useSubredditPosts(getInitialSubreddit());
 
   const handleSubredditSelect = (selectedSubreddit: string) => {
     setSubreddit(selectedSubreddit);

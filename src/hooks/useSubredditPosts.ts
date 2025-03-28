@@ -13,29 +13,70 @@ interface CachedPosts {
 
 // Interface for storing sort preferences by subreddit
 interface SubredditSortPreferences {
-  [subreddit: string]: SortType;
+  [key: string]: SortType;
 }
 
-// Default post limits for each subreddit
+// Cache duration: 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
+
+// Default post limits by subreddit
 const DEFAULT_SUBREDDIT_POST_LIMITS: Record<string, number> = {
-  thewallstreet: 3,
-  stocks: 2,
-  singularity: 8,
-  localllama: 8,
-  wallstreetbets: 8,
+  'thewallstreet': 3,
+  'stocks': 10,
+  'wallstreetbets': 10,
+  'singularity': 10,
+  'localllama': 10,
+  // Default for other subreddits
+  'default': 10
 };
 
-// Cache duration in milliseconds
-const CACHE_DURATION = 1 * 60 * 1000; // 1 minute
-
-export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') => {
-  // State for posts and loading status
+export const useSubredditPosts = (initialSubreddit: string) => {
   const [posts, setPosts] = useState<RedditPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [subreddit, setSubreddit] = useState(initialSubreddit);
-  const [selectedPostIndex, setSelectedPostIndex] = useState(0);
+  
+  // Get initial state from URL parameters if available
+  const getInitialStateFromURL = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const subredditParam = params.get('subreddit');
+      const postIndexParam = params.get('post');
+      
+      return {
+        subreddit: subredditParam || initialSubreddit,
+        postIndex: postIndexParam ? parseInt(postIndexParam, 10) : 0
+      };
+    }
+    
+    return { subreddit: initialSubreddit, postIndex: 0 };
+  };
+  
+  const initialState = getInitialStateFromURL();
+  const [subreddit, setSubreddit] = useState(initialState.subreddit);
+  const [selectedPostIndex, setSelectedPostIndex] = useState(initialState.postIndex);
   const [cachedPosts, setCachedPosts] = useState<CachedPosts>({});
+
+  // Update URL parameters when subreddit or selectedPostIndex changes
+  const updateURLParams = useCallback((newSubreddit: string, newPostIndex: number) => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('subreddit', newSubreddit);
+      url.searchParams.set('post', newPostIndex.toString());
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
+
+  // Wrap the original setSubreddit to also update URL
+  const setSubredditWithURL = useCallback((newSubreddit: string) => {
+    setSubreddit(newSubreddit);
+    updateURLParams(newSubreddit, 0); // Reset post index when changing subreddit
+  }, [updateURLParams]);
+
+  // Wrap the original setSelectedPostIndex to also update URL
+  const setSelectedPostIndexWithURL = useCallback((newIndex: number) => {
+    setSelectedPostIndex(newIndex);
+    updateURLParams(subreddit, newIndex);
+  }, [subreddit, updateURLParams]);
 
   // Initialize sort preferences from localStorage
   const [sortPreferences, setSortPreferences] = useState<SubredditSortPreferences>(() => {
@@ -118,7 +159,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       setLoading(true);
       setError(null);
 
-      const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || 4;
+      const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || DEFAULT_SUBREDDIT_POST_LIMITS.default;
       const data = await fetchSubredditPosts(subreddit, postLimit, sort);
 
       // Process each post for improved comment handling
@@ -126,7 +167,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
         // Process comments to mark which ones are new using markNewComments
         const processedComments = markNewComments(post.comments, post.permalink);
         
-        // Count the number of new comments
+        // Count new comments
         const newCommentsCount = countNewComments(post.comments, post.permalink);
         
         return {
@@ -139,7 +180,11 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       });
 
       setPosts(processedData);
-      setSelectedPostIndex(0); // Reset selected post when changing sort
+      // Keep selected post index when refreshing with new sort
+      const currentIndex = Math.min(selectedPostIndex, processedData.length - 1);
+      if (currentIndex !== selectedPostIndex) {
+        setSelectedPostIndexWithURL(currentIndex);
+      }
 
       // Update cache with fresh data
       setCachedPosts((prev) => ({
@@ -154,7 +199,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     } finally {
       setLoading(false);
     }
-  }, [subreddit, markNewComments, countNewComments]);
+  }, [subreddit, selectedPostIndex, markNewComments, countNewComments, setSelectedPostIndexWithURL]);
 
   // Function to update sort preference for a subreddit
   const updateSortPreference = useCallback((updateSubreddit: string, newSort: SortType) => {
@@ -165,7 +210,7 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     setSortPreferences(updatedPreferences);
     localStorage.setItem('sortPreferences', JSON.stringify(updatedPreferences));
 
-    // Refresh posts if this is the currently viewed subreddit
+    // Refresh posts if this is the current subreddit
     if (updateSubreddit === subreddit) {
       refreshPostsWithSort(newSort);
     }
@@ -218,12 +263,18 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
         });
 
         setPosts(markedData);
+        
+        // If the selected post index is out of bounds, adjust it
+        if (selectedPostIndex >= markedData.length) {
+          setSelectedPostIndexWithURL(Math.max(0, markedData.length - 1));
+        }
+        
         setLoading(false);
         return;
       }
 
-      // Get the post limit for the current subreddit or use default of 4
-      const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || 4;
+      // Get the post limit for the current subreddit or use default
+      const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || DEFAULT_SUBREDDIT_POST_LIMITS.default;
       const data = await fetchSubredditPosts(subreddit, postLimit, currentSort);
 
       // Process each post with comments
@@ -249,7 +300,12 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
 
       // Ensure we're only using the latest data from the server
       setPosts(processedData);
-      setSelectedPostIndex(0); // Reset selected post when changing subreddit
+      
+      // Keep the current post index if possible, otherwise reset it
+      const validIndex = Math.min(selectedPostIndex, processedData.length - 1);
+      if (validIndex !== selectedPostIndex) {
+        setSelectedPostIndexWithURL(validIndex);
+      }
 
       // Update cache with only the latest data from the server
       setCachedPosts((prev) => ({
@@ -267,10 +323,12 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
   }, [
     subreddit,
     cachedPosts,
+    selectedPostIndex,
     getCurrentSortPreference,
     markNewComments,
     collectCommentIds,
     countNewComments,
+    setSelectedPostIndexWithURL,
   ]);
 
   // Force refresh posts for the current subreddit
@@ -280,7 +338,8 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
       setLoading(true);
       setError(null);
 
-      const data = await fetchSubredditPosts(subreddit, undefined, currentSort);
+      const postLimit = DEFAULT_SUBREDDIT_POST_LIMITS[subreddit] || DEFAULT_SUBREDDIT_POST_LIMITS.default;
+      const data = await fetchSubredditPosts(subreddit, postLimit, currentSort);
 
       // Process each post with comments
       const now = Date.now();
@@ -308,6 +367,12 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
 
       // Update UI with the processed posts first
       setPosts(processedData);
+      
+      // Keep the current post index if possible, otherwise adjust it
+      const validIndex = Math.min(selectedPostIndex, processedData.length - 1);
+      if (validIndex !== selectedPostIndex) {
+        setSelectedPostIndexWithURL(validIndex);
+      }
 
       // Update cache with fresh data
       setCachedPosts((prev) => ({
@@ -324,12 +389,13 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     }
   }, [
     subreddit,
+    selectedPostIndex,
     getCurrentSortPreference,
     markNewComments,
     collectCommentIds,
     countNewComments,
+    setSelectedPostIndexWithURL,
   ]);
-
 
   // Fetch posts when subreddit changes
   useEffect(() => {
@@ -341,9 +407,9 @@ export const useSubredditPosts = (initialSubreddit: string = 'thewallstreet') =>
     loading,
     error,
     subreddit,
-    setSubreddit,
+    setSubreddit: setSubredditWithURL,
     selectedPostIndex,
-    setSelectedPostIndex,
+    setSelectedPostIndex: setSelectedPostIndexWithURL,
     markPostAsRead,
     readPosts,
     getCurrentSortPreference,
