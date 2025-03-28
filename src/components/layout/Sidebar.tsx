@@ -101,7 +101,7 @@ const Sidebar = ({
             value={inputSubreddit}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="w-full px-4 py-2 text-lg md:text-sm pr-10 border rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:ring-orange-400 dark:focus:border-orange-400 transition-colors text-base"
+            className="w-full px-4 py-2 text-xl md:text-sm pr-10 border rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:ring-orange-400 dark:focus:border-orange-400 transition-colors text-base"
             placeholder="Enter subreddit name"
             aria-label="Subreddit name"
           />
