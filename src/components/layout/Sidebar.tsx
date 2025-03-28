@@ -41,6 +41,17 @@ const Sidebar = ({
     }
   }, []);
 
+  // Auto-dismiss error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   // Save mySubreddits to localStorage whenever it changes
   useEffect(() => {
     if (mySubreddits.length > 0) {
@@ -53,7 +64,7 @@ const Sidebar = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputSubreddit(e.target.value);
-    // Clear error when input changes
+    // Clear error immediately when input changes
     if (error) setError(null);
   };
 
@@ -71,10 +82,11 @@ const Sidebar = ({
         if (!exists) {
           setError(`Subreddit r/${newSubreddit} doesn't exist`);
           setIsLoading(false);
-          return;
+          return; // Early return to prevent navigation
         }
       }
       
+      // Only proceed with navigation and adding to mySubreddits if validation passes
       onSubredditSelect(newSubreddit);
 
       // Add to mySubreddits if not already in the list
@@ -161,11 +173,24 @@ const Sidebar = ({
         </div>
         
         {error && (
-          <div className="mb-4 px-3 py-2 text-sm bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-md flex items-center">
+          <div 
+            className="mb-4 px-3 py-2 text-sm bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-md flex items-center animate-pulse border border-red-300 dark:border-red-700 shadow-sm"
+            role="alert"
+            aria-live="assertive"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
-            {error}
+            <span className="font-medium flex-grow">{error}</span>
+            <button 
+              onClick={() => setError(null)} 
+              className="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              aria-label="Dismiss error"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         )}
       </div>
