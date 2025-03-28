@@ -93,7 +93,7 @@ async function fetchSubredditData(
 
       // Fetch all top-level comments (expanding "more comments")
       const commentsListing = await submission.comments.fetchMore({
-        amount: Infinity,
+        amount: 100,
         skipReplies: false,
       });
       const comments = await Promise.all(
