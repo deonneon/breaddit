@@ -79,5 +79,54 @@ const fetchSubredditPosts = async (
   }
 };
 
-export { fetchSubredditPosts };
+/**
+ * Validates if a subreddit exists by attempting to fetch its posts
+ * @param subreddit The subreddit name to validate
+ * @returns A promise that resolves to true if the subreddit exists, false otherwise
+ */
+const validateSubreddit = async (subreddit: string): Promise<boolean> => {
+  try {
+    console.log(`Validating subreddit: ${subreddit}`);
+    
+    // Fix URL construction to work with both absolute and relative paths
+    const urlString = `${API_BASE_URL}/posts/${subreddit}`;
+
+    // If it's a relative URL (starts with /), prepend the current origin
+    const url = urlString.startsWith("/")
+      ? new URL(urlString, window.location.origin)
+      : new URL(urlString);
+
+    // Only fetch a single post to validate existence
+    url.searchParams.append("limit", "1");
+    
+    console.log(`Making validation request to: ${url.toString()}`);
+
+    const response = await fetch(url.toString(), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    
+    const isValid = response.ok;
+    console.log(`Subreddit ${subreddit} validation result: ${isValid ? 'exists' : 'does not exist'}`);
+    
+    if (!isValid) {
+      // Log more details about the error
+      console.error(`Subreddit validation error: ${response.status} ${response.statusText}`);
+      try {
+        const errorText = await response.text();
+        console.error(`Error response: ${errorText}`);
+      } catch (e) {
+        console.error('Could not read error response text');
+      }
+    }
+
+    return isValid;
+  } catch (error) {
+    console.error("Error validating subreddit:", error);
+    return false;
+  }
+};
+
+export { fetchSubredditPosts, validateSubreddit };
 export type { RedditPost, RedditComment, SortType };

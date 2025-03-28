@@ -58,6 +58,12 @@ const MainContent: FC<MainContentProps> = ({
   // Update newCommentsCount based on the current post detail ref
   useEffect(() => {
     const updateNewCommentsCount = () => {
+      // First check if posts exist and the selected index is valid
+      if (!posts.length || selectedPostIndex >= posts.length) {
+        setNewCommentsCount(0);
+        return;
+      }
+      
       let count = 0;
       if (window.innerWidth >= 1536) {
         count = desktopPostDetailRef.current?.getNewCommentsCount() || 0;
@@ -170,7 +176,7 @@ const MainContent: FC<MainContentProps> = ({
   if (posts.length === 0) {
     return (
       <div className="w-full h-[calc(100*var(--vh,1vh))] flex items-center justify-center">
-        <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-4 rounded-lg shadow-sm">
+        <div className="mx-10 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-4 rounded-lg shadow-sm">
           <div className="flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -186,7 +192,7 @@ const MainContent: FC<MainContentProps> = ({
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            No posts found for r/{subreddit}
+            r/{subreddit} does not exists. Please try a different subreddit.
           </div>
         </div>
       </div>

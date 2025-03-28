@@ -13,6 +13,7 @@ interface SidebarProps {
   updateGlobalSortPreference: (sortType: SortType) => void;
   fontSize: FontSize;
   updateFontSize: (size: FontSize) => void;
+  validateSubreddit?: (subreddit: string) => Promise<boolean>;
 }
 
 const Sidebar = ({
@@ -24,10 +25,13 @@ const Sidebar = ({
   updateGlobalSortPreference,
   fontSize,
   updateFontSize,
+  validateSubreddit,
 }: SidebarProps) => {
   const [inputSubreddit, setInputSubreddit] = useState("");
   const [mySubreddits, setMySubreddits] = useState<string[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load saved subreddits from localStorage on component mount
   useEffect(() => {
@@ -49,11 +53,28 @@ const Sidebar = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputSubreddit(e.target.value);
+    // Clear error when input changes
+    if (error) setError(null);
   };
 
-  const handleFetchClick = () => {
-    if (inputSubreddit.trim()) {
-      const newSubreddit = inputSubreddit.trim();
+  const handleFetchClick = async () => {
+    if (!inputSubreddit.trim()) return;
+    
+    const newSubreddit = inputSubreddit.trim();
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // If validateSubreddit function is provided, use it to check if subreddit exists
+      if (validateSubreddit) {
+        const exists = await validateSubreddit(newSubreddit);
+        if (!exists) {
+          setError(`Subreddit r/${newSubreddit} doesn't exist`);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
       onSubredditSelect(newSubreddit);
 
       // Add to mySubreddits if not already in the list
@@ -65,6 +86,10 @@ const Sidebar = ({
       }
 
       setInputSubreddit("");
+    } catch (err) {
+      setError(`Error fetching subreddit: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -107,25 +132,42 @@ const Sidebar = ({
           />
           <button
             onClick={handleFetchClick}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300"
+            disabled={isLoading}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Fetch posts"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            {isLoading ? (
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            )}
           </button>
         </div>
+        
+        {error && (
+          <div className="mb-4 px-3 py-2 text-sm bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-md flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            {error}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">

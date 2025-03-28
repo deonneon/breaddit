@@ -1,5 +1,6 @@
 import { FC } from "react";
 import type { SortType } from "../../services/redditService";
+import { validateSubreddit } from "../../services/redditService";
 import type { FontSize } from "../../hooks/useUISettings";
 import Sidebar from "./Sidebar";
 
@@ -143,6 +144,7 @@ const MobileHeader: FC<MobileHeaderProps> = ({
             updateGlobalSortPreference={updateGlobalSortPreference}
             fontSize={fontSize}
             updateFontSize={updateFontSize}
+            validateSubreddit={validateSubreddit}
           />
         </div>
       )}

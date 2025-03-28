@@ -195,7 +195,12 @@ export const useSubredditPosts = (initialSubreddit: string) => {
         },
       }));
     } catch (error) {
+      // Set error message
       setError(`Failed to refresh posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+      // Clear posts array to avoid accessing undefined properties
+      setPosts([]);
+      // Reset selected post index to prevent accessing invalid indices
+      setSelectedPostIndexWithURL(0);
     } finally {
       setLoading(false);
     }
@@ -317,6 +322,10 @@ export const useSubredditPosts = (initialSubreddit: string) => {
       }));
     } catch (error) {
       setError(`Failed to fetch posts: ${error instanceof Error ? error.message : "Unknown error"} Please try again in a few minutes.`);
+      // Clear posts array to avoid accessing undefined properties
+      setPosts([]);
+      // Reset selected post index to prevent accessing invalid indices
+      setSelectedPostIndexWithURL(0);
     } finally {
       setLoading(false);
     }
@@ -384,6 +393,10 @@ export const useSubredditPosts = (initialSubreddit: string) => {
       }));
     } catch (error) {
       setError(`Failed to refresh posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+      // Clear posts array to avoid accessing undefined properties
+      setPosts([]);
+      // Reset selected post index to prevent accessing invalid indices
+      setSelectedPostIndexWithURL(0);
     } finally {
       setLoading(false);
     }

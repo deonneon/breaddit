@@ -5,6 +5,7 @@ import MobileHeader from "./components/layout/MobileHeader";
 import { useSubredditPosts } from "./hooks/useSubredditPosts";
 import { useComments } from "./hooks/useComments";
 import { useUISettings, FontSize } from "./hooks/useUISettings";
+import { validateSubreddit } from "./services/redditService";
 import { useEffect } from "react";
 
 // Default subreddits that are always available
@@ -118,6 +119,7 @@ const App = () => {
           updateGlobalSortPreference={updateGlobalSortPreference}
           fontSize={fontSize as FontSize}
           updateFontSize={updateFontSize as (size: FontSize) => void}
+          validateSubreddit={validateSubreddit}
         />
       </div>
 
