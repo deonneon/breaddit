@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from "react";
+import { useState, useCallback, useEffect, useImperativeHandle, forwardRef } from "react";
 import type { RedditPost, RedditComment } from "../../services/redditService";
 import Comment from "./Comment";
 import { formatDate } from "../../utils/formatters";
