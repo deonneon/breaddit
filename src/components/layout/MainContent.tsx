@@ -1,9 +1,11 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import PostCard from "../posts/PostCard";
 import PostDetail, { PostDetailHandle } from "../posts/PostDetail";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ScrollToTop from "../ui/ScrollToTop";
 import MarkAllSeen from "../ui/MarkAllSeen";
+import MobileMenu from "../ui/MobileMenu";
+import MobileSidebar from "./MobileSidebar";
 import type { RedditPost, RedditComment } from "../../services/redditService";
 
 interface MainContentProps {
@@ -46,6 +48,34 @@ const MainContent: FC<MainContentProps> = ({
   const mobilePostDetailRef = useRef<PostDetailHandle>(null);
   const desktopPostDetailRef = useRef<PostDetailHandle>(null);
   
+  // Add state to track new comments count
+  const [newCommentsCount, setNewCommentsCount] = useState(0);
+  
+  // Add state for mobile sidebar visibility
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(true);
+  
+  // Update newCommentsCount based on the current post detail ref
+  useEffect(() => {
+    const updateNewCommentsCount = () => {
+      let count = 0;
+      if (window.innerWidth >= 1536) {
+        count = desktopPostDetailRef.current?.getNewCommentsCount() || 0;
+      } else {
+        count = mobilePostDetailRef.current?.getNewCommentsCount() || 0;
+      }
+      setNewCommentsCount(count);
+    };
+    
+    // Initial update
+    updateNewCommentsCount();
+    
+    // Set up interval to check for new comments count
+    const interval = setInterval(updateNewCommentsCount, 1000);
+    
+    return () => clearInterval(interval);
+  }, [selectedPostIndex, posts]);
+
   const handleScroll = () => {
     // Only set up on mobile and not on 2xl screens
     const isMobile = window.innerWidth < 768;
@@ -54,6 +84,7 @@ const MainContent: FC<MainContentProps> = ({
 
     const scrollPosition = window.scrollY;
     setShowScrollTop(scrollPosition > 1200);
+    setShowMobileMenu(true); // Always show mobile menu on mobile
   };
 
   useEffect(() => {
@@ -92,6 +123,14 @@ const MainContent: FC<MainContentProps> = ({
     } else {
       mobilePostDetailRef.current?.markAllCommentsSeen();
     }
+    
+    // Update the new comments count to zero
+    setNewCommentsCount(0);
+  };
+
+  // Toggle mobile sidebar
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 
   if (loading) {
@@ -157,6 +196,19 @@ const MainContent: FC<MainContentProps> = ({
   // For 2xl screens, we'll display a different layout with a traditional sidebar
   return (
     <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      {/* Mobile sidebar component */}
+      <MobileSidebar
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+        posts={posts}
+        selectedPostIndex={selectedPostIndex}
+        setSelectedPostIndex={setSelectedPostIndex}
+        markPostAsRead={markPostAsRead}
+        readPosts={readPosts}
+        refreshPosts={refreshPosts}
+        subreddit={subreddit}
+      />
+
       {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
       <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-[calc(100*var(--vh,1vh))] 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
         {/* Subreddit title and refresh button */}
@@ -356,9 +408,18 @@ const MainContent: FC<MainContentProps> = ({
           )}
         </div>
 
+        {/* Mobile menu button */}
+        <MobileMenu
+          show={showMobileMenu}
+          onClick={toggleMobileSidebar}
+        />
+
         {/* Mark all seen button - show only when a post is selected */}
         {selectedPostIndex < posts.length && (
-          <MarkAllSeen onClick={handleMarkCurrentPostCommentsSeen} />
+          <MarkAllSeen 
+            onClick={handleMarkCurrentPostCommentsSeen} 
+            hasNewComments={newCommentsCount > 0}
+          />
         )}
 
         {/* Scroll to top button */}
@@ -380,7 +441,10 @@ const MainContent: FC<MainContentProps> = ({
         {/* Mark all seen button for 2xl screens */}
         {selectedPostIndex < posts.length && (
           <div className="2xl:block hidden">
-            <MarkAllSeen onClick={handleMarkCurrentPostCommentsSeen} />
+            <MarkAllSeen 
+              onClick={handleMarkCurrentPostCommentsSeen} 
+              hasNewComments={newCommentsCount > 0}
+            />
           </div>
         )}
       </div>

@@ -1,13 +1,13 @@
 import { FC } from "react";
 
-interface ScrollToTopProps {
+interface MobileMenuProps {
   show: boolean;
   onClick: () => void;
 }
 
-const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
+const MobileMenu: FC<MobileMenuProps> = ({ show, onClick }) => {
   return (
-    <div className="fixed bottom-20 left-2 z-10 md:bottom-8 md:right-8">
+    <div className="fixed bottom-44 left-2 z-10 md:hidden">
       <button
         onClick={onClick}
         className={`
@@ -16,13 +16,13 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
               ? "opacity-90 scale-100"
               : "opacity-0 scale-95 pointer-events-none"
           }
-          hover:bg-orange-600/90 text-gray-300
+          bg-gray-800/90 dark:bg-gray-700/90 hover:bg-gray-700/90 dark:hover:bg-gray-600/90 text-white
           rounded-lg p-2 shadow-xl backdrop-blur-md
           transition-all duration-200 border border-white/20
           relative before:absolute before:inset-[-12px] before:content-['']
         `}
-        aria-label="Scroll to top"
-        title="Back to top"
+        aria-label="Open mobile sidebar"
+        title="Open sidebar"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M5 10l7-7m0 0l7 7m-7-7v18"
+            d="M4 6h16M4 12h16M4 18h16"
           />
         </svg>
       </button>
@@ -43,4 +43,4 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
   );
 };
 
-export default ScrollToTop;
+export default MobileMenu; 

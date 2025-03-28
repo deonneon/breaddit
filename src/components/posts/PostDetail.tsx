@@ -18,6 +18,7 @@ interface PostDetailProps {
 
 export interface PostDetailHandle {
   markAllCommentsSeen: () => void;
+  getNewCommentsCount: () => number;
 }
 
 const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
@@ -75,16 +76,22 @@ const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
     processCommentsWithNewFlags,
   ]);
 
+  // Function to get the current new comments count
+  const getNewCommentsCount = useCallback(() => {
+    return localMarkSeen ? 0 : post._newCommentsCount || 0;
+  }, [localMarkSeen, post._newCommentsCount]);
+
   // Expose the markAllCommentsSeen method to parent components
   useImperativeHandle(ref, () => ({
-    markAllCommentsSeen: handleMarkAllSeen
-  }), [handleMarkAllSeen]);
+    markAllCommentsSeen: handleMarkAllSeen,
+    getNewCommentsCount
+  }), [handleMarkAllSeen, getNewCommentsCount]);
 
   // Check if this is the first time seeing this post/thread
   const isFirstTimeSeenPost = !seenComments[post.permalink];
 
   // Get the count of new comments for the post, respecting local marked state
-  const newCommentsCount = localMarkSeen ? 0 : post._newCommentsCount || 0;
+  const newCommentsCount = getNewCommentsCount();
 
   // Reset ALL state when post changes
   useEffect(() => {
