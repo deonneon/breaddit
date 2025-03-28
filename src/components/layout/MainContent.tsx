@@ -292,6 +292,7 @@ const MainContent: FC<MainContentProps> = ({
         <div className="space-y-8 pb-16 w-full max-w-full">
           {selectedPostIndex < posts.length && (
             <PostDetail
+              key={posts[selectedPostIndex].permalink}
               post={posts[selectedPostIndex]}
               seenComments={seenComments}
               markAllCommentsAsSeen={markAllCommentsAsSeen}
@@ -310,6 +311,7 @@ const MainContent: FC<MainContentProps> = ({
       <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
         {selectedPostIndex < posts.length && (
           <PostDetail
+            key={posts[selectedPostIndex].permalink}
             post={posts[selectedPostIndex]}
             seenComments={seenComments}
             markAllCommentsAsSeen={markAllCommentsAsSeen}

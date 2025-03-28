@@ -77,19 +77,22 @@ const PostDetail: FC<PostDetailProps> = ({
   // Get the count of new comments for the post, respecting local marked state
   const newCommentsCount = localMarkSeen ? 0 : post._newCommentsCount || 0;
 
-  // When post changes, process comments
+  // Reset ALL state when post changes
   useEffect(() => {
+    // Reset state for a new post
+    setProcessedComments([]);
+    setLocalMarkSeen(false);
+    setShowNewCommentsModal(false);
+    
+    // Process comments immediately
     if (post.comments?.length > 0) {
-      // Process comments with their current isNew state
       const updatedComments = processCommentsWithNewFlags(
         post.comments,
-        localMarkSeen
+        false // Always start with seen state from props
       );
       setProcessedComments(updatedComments);
-    } else {
-      setProcessedComments([]);
     }
-  }, [post.comments, localMarkSeen, processCommentsWithNewFlags]);
+  }, [post.permalink, processCommentsWithNewFlags, post.comments]);
 
   useEffect(() => {
     if (isFirstTimeSeenPost && post.comments?.length > 0) {
