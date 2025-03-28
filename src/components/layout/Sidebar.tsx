@@ -94,7 +94,7 @@ const Sidebar = ({
         </h1>
       </div>
 
-      <div className="py-3 mt-20 md:my-4">
+      <div className="p-3 mt-20 md:my-4">
         <div className="relative mb-6">
           <input
             type="text"
