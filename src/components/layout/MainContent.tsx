@@ -274,7 +274,58 @@ const MainContent: FC<MainContentProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-4 w-full max-w-full">
+        <div className="flex flex-col gap-3 mb-4 w-full max-w-full md:hidden">
+          {/* Mobile only - title with scrolling indicators */}
+          <div className="flex items-center justify-between px-1 mb-1">
+            <h2 className="text-lg font-medium text-gray-800 dark:text-white">Posts</h2>
+            <div className="flex items-center gap-1">
+              <div className="h-1 w-4 bg-orange-500 rounded-full opacity-70"></div>
+              <div className="h-1 w-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+              <div className="h-1 w-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+            </div>
+          </div>
+          
+          {/* Single scrollable container with two rows of posts */}
+          <div className="overflow-x-auto pb-2 snap-x scrollbar-hide scroll-smooth -mx-4 px-4">
+            <div className="w-max flex flex-col gap-3">
+              {/* First row */}
+              <div className="flex gap-3">
+                {posts.slice(0, Math.ceil(posts.length / 2)).map((post, index) => (
+                  <div key={post.permalink} className="snap-start">
+                    <PostCard
+                      post={post}
+                      isSelected={selectedPostIndex === index}
+                      isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+                      onClick={() => {
+                        setSelectedPostIndex(index);
+                        markPostAsRead(post.permalink);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              {/* Second row */}
+              <div className="flex gap-3">
+                {posts.slice(Math.ceil(posts.length / 2)).map((post, index) => (
+                  <div key={post.permalink} className="snap-start">
+                    <PostCard
+                      post={post}
+                      isSelected={selectedPostIndex === Math.ceil(posts.length / 2) + index}
+                      isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+                      onClick={() => {
+                        setSelectedPostIndex(Math.ceil(posts.length / 2) + index);
+                        markPostAsRead(post.permalink);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden md:grid md:grid-cols-3 xl:grid-cols-4 gap-3 mb-4 w-full max-w-full">
           {posts.map((post, index) => (
             <PostCard
               key={post.permalink}

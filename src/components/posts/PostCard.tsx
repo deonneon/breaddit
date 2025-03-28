@@ -12,7 +12,7 @@ const PostCard: FC<PostCardProps> = ({ post, isSelected, isNew, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={`px-3 md:px-4 py-2 h-auto min-h-16 rounded-lg text-sm w-full text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow ${
+      className={`px-3 md:px-4 py-2 h-auto md:min-h-16 rounded-lg text-sm text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow flex-shrink-0 max-w-[200px] md:max-w-none md:w-full ${
         isSelected
           ? `bg-orange-500 text-white shadow-md transform scale-[1.02] ${
               isNew ? "border-l-2 border-green-300" : ""
@@ -24,7 +24,7 @@ const PostCard: FC<PostCardProps> = ({ post, isSelected, isNew, onClick }) => {
       aria-label={`Select post "${post.title}${isNew ? " (New)" : ""}`}
       title={post.title}
     >
-      <div className="line-clamp-3">{post.title}</div>
+      <div className="line-clamp-2 md:line-clamp-3">{post.title}</div>
     </button>
   );
 };

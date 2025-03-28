@@ -81,5 +81,19 @@ export default {
   },
   plugins: [
     require('@tailwindcss/typography'),
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.scrollbar-hide': {
+          /* For Chrome, Safari and Opera */
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          /* For IE, Edge and Firefox */
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none'
+        }
+      }
+      addUtilities(newUtilities)
+    }
   ],
 };
