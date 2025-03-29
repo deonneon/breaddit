@@ -324,12 +324,12 @@ const MainContent: FC<MainContentProps> = ({
               >
                 <div className="flex items-start">
                   {/* New post indicator */}
-                  {post.isNewlyFetched && !readPosts[post.permalink] && (
+                  {/* {post.isNewlyFetched && !readPosts[post.permalink] && (
                     <span
                       className="flex-shrink-0 h-2 w-2 mt-1.5 mr-2 bg-green-500 rounded-full"
                       aria-label="New post"
                     ></span>
-                  )}
+                  )} */}
                   <div className="flex-1">
                     <h3
                       className={`text-sm font-medium mb-1 line-clamp-2 ${
@@ -405,7 +405,8 @@ const MainContent: FC<MainContentProps> = ({
                     <PostCard
                       post={post}
                       isSelected={selectedPostIndex === index}
-                      isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+                      // isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+                      isNew={false}
                       onClick={() => {
                         setSelectedPostIndex(index);
                         markPostAsRead(post.permalink);
@@ -423,7 +424,8 @@ const MainContent: FC<MainContentProps> = ({
                     <PostCard
                       post={post}
                       isSelected={selectedPostIndex === Math.ceil(posts.length / 2) + index}
-                      isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+                      // isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+                      isNew={false}
                       onClick={() => {
                         setSelectedPostIndex(Math.ceil(posts.length / 2) + index);
                         markPostAsRead(post.permalink);
@@ -443,7 +445,8 @@ const MainContent: FC<MainContentProps> = ({
               key={post.permalink}
               post={post}
               isSelected={selectedPostIndex === index}
-              isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+              // isNew={!!(post.isNewlyFetched && !readPosts[post.permalink])}
+              isNew={false}
               onClick={() => {
                 setSelectedPostIndex(index);
                 markPostAsRead(post.permalink);

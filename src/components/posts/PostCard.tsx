@@ -9,10 +9,13 @@ interface PostCardProps {
 }
 
 const PostCard: FC<PostCardProps> = ({ post, isSelected, isNew, onClick }) => {
+  const newCommentsCount = post._newCommentsCount || 0;
+
+
   return (
     <button
       onClick={onClick}
-      className={`px-3 md:px-4 py-2 w-[200px] h-[80px] md:h-auto md:min-h-16 rounded-lg text-sm text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow flex-shrink-0 md:max-w-none md:w-full ${
+      className={`relative px-3 md:px-4 py-2 w-[200px] h-[80px] md:h-auto md:min-h-16 rounded-lg text-sm text-left overflow-hidden transition-all duration-200 shadow-sm hover:shadow flex-shrink-0 md:max-w-none md:w-full ${
         isSelected
           ? `bg-orange-500 text-white shadow-md transform scale-[1.02] ${
               isNew ? "border-l-2 border-green-300" : ""
@@ -25,6 +28,13 @@ const PostCard: FC<PostCardProps> = ({ post, isSelected, isNew, onClick }) => {
       title={post.title}
     >
       <div className="line-clamp-2 md:line-clamp-3">{post.title}</div>
+
+      {/* New comments badge */}
+      {isNew && newCommentsCount > 0 && (
+        <div className="absolute top-1 right-1 min-w-[20px] h-5 flex items-center justify-center px-1 text-xs font-semibold rounded-full bg-green-500 text-white">
+          {newCommentsCount}
+        </div>
+      )}        
     </button>
   );
 };
