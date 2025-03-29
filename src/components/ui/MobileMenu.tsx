@@ -7,7 +7,7 @@ interface MobileMenuProps {
 
 const MobileMenu: FC<MobileMenuProps> = ({ show, onClick }) => {
   return (
-    <div className="fixed bottom-44 left-2 z-10 md:hidden">
+    <div className="fixed bottom-5 left-[35%]  z-10 md:hidden">
       <button
         onClick={onClick}
         className={`
