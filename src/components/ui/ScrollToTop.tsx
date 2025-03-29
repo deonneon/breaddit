@@ -7,7 +7,7 @@ interface ScrollToTopProps {
 
 const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
   return (
-    <div className="fixed bottom-5 left-[65%] z-10 md:bottom-8 md:right-8">
+    <div className="fixed bottom-8 left-[65%] translate-x-[-50%] z-10 md:bottom-8 md:right-8">
       <button
         onClick={onClick}
         className={`
@@ -16,7 +16,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
               ? "opacity-90 scale-100"
               : "opacity-0 scale-95 pointer-events-none"
           }
-          hover:bg-orange-600/90 text-gray-300
+          bg-gray-400/90 dark:bg-gray-700/90 hover:bg-orange-600/90 text-white dark:text-gray-300 
           rounded-lg p-2 shadow-xl backdrop-blur-md
           transition-all duration-200 border border-white/20
           relative before:absolute before:inset-[-12px] before:content-['']
@@ -26,7 +26,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-5 w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

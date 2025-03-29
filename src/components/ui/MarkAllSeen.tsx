@@ -22,23 +22,23 @@ const MarkAllSeen: FC<MarkAllSeenProps> = ({ onClick, hasNewComments = false }) 
   const isDisabled = !hasNewComments && !isChecked;
 
   return (
-    <div className="fixed bottom-5 left-[50%]  z-10 md:bottom-20 md:right-8">
+    <div className="fixed bottom-8 left-[50%] translate-x-[-50%] z-10 md:bottom-20 md:right-8">
       <button
         onClick={handleClick}
         className={`opacity-90 ${
           isChecked 
             ? 'bg-gray-400/90 dark:bg-gray-700/90' 
             : hasNewComments 
-              ? 'bg-green-500/90 hover:bg-green-600/90' 
+              ? 'bg-green-700/90 hover:bg-green-800/90' 
               : 'bg-gray-400/90 dark:bg-gray-700/90'
-        } text-white rounded-lg p-2 shadow-xl backdrop-blur-md transition-all duration-200 border border-white/20 relative before:absolute before:inset-[-12px] before:content-[''] flex items-center`}
+        } text-white dark:text-gray-300 rounded-lg p-2 shadow-xl backdrop-blur-md transition-all duration-200 border border-white/20 relative before:absolute before:inset-[-12px] before:content-[''] flex items-center`}
         aria-label="Mark all comments as seen in the current post"
         title="Mark all comments as seen"
         disabled={isDisabled}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-5 w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

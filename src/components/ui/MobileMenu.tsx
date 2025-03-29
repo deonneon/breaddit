@@ -7,7 +7,7 @@ interface MobileMenuProps {
 
 const MobileMenu: FC<MobileMenuProps> = ({ show, onClick }) => {
   return (
-    <div className="fixed bottom-5 left-[35%]  z-10 md:hidden">
+    <div className="fixed bottom-8 left-[35%] translate-x-[-50%] z-10 md:hidden">
       <button
         onClick={onClick}
         className={`
@@ -16,7 +16,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ show, onClick }) => {
               ? "opacity-90 scale-100"
               : "opacity-0 scale-95 pointer-events-none"
           }
-          bg-gray-800/90 dark:bg-gray-700/90 hover:bg-gray-700/90 dark:hover:bg-gray-600/90 text-white
+          bg-gray-400/90 dark:bg-gray-700/90 hover:bg-orange-600/90 text-white dark:text-gray-300 
           rounded-lg p-2 shadow-xl backdrop-blur-md
           transition-all duration-200 border border-white/20
           relative before:absolute before:inset-[-12px] before:content-['']
@@ -26,7 +26,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ show, onClick }) => {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-5 w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
