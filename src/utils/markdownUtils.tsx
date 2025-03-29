@@ -1,8 +1,17 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+// Function to filter out Reddit emotes
+export const filterRedditEmotes = (text: string): string => {
+  // This regex matches the pattern ![img](emote|t5_2th52|4260) and similar formats
+  return text.replace(/!\[img\]\(emote\|[^)]+\)/g, '');
+};
+
 // Function to render markdown with custom components
 export const renderMarkdown = (text: string) => {
+  // Filter out Reddit emotes before rendering
+  const filteredText = filterRedditEmotes(text);
+  
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -60,7 +69,7 @@ export const renderMarkdown = (text: string) => {
         )
       }}
     >
-      {text}
+      {filteredText}
     </ReactMarkdown>
   );
 }; 
