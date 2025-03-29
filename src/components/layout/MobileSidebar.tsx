@@ -11,6 +11,7 @@ interface MobileSidebarProps {
   readPosts: Record<string, number>;
   refreshPosts: () => void;
   subreddit: string;
+  scrollPostDetailToTop: () => void;
 }
 
 const MobileSidebar: FC<MobileSidebarProps> = ({
@@ -23,10 +24,12 @@ const MobileSidebar: FC<MobileSidebarProps> = ({
   readPosts,
   refreshPosts,
   subreddit,
+  scrollPostDetailToTop,
 }) => {
   const handleSelectPost = (index: number) => {
     setSelectedPostIndex(index);
     markPostAsRead(posts[index].permalink);
+    scrollPostDetailToTop();
     onClose();
   };
 

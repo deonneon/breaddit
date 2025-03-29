@@ -245,6 +245,7 @@ const MainContent: FC<MainContentProps> = ({
         readPosts={readPosts}
         refreshPosts={refreshPosts}
         subreddit={subreddit}
+        scrollPostDetailToTop={scrollPostDetailToTop}
       />
 
       {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
