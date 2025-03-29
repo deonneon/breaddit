@@ -16,7 +16,7 @@ const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
               ? "opacity-90 scale-100"
               : "opacity-0 scale-95 pointer-events-none"
           }
-          bg-gray-400/90 dark:bg-gray-700/90 hover:bg-orange-600/90 text-white dark:text-gray-300 
+          bg-gray-300/90 dark:bg-gray-700/90 hover:bg-orange-600/90 text-white dark:text-gray-300 
           rounded-lg p-2 shadow-xl backdrop-blur-md
           transition-all duration-200 border border-white/20
           relative before:absolute before:inset-[-12px] before:content-['']

@@ -382,7 +382,7 @@ const MainContent: FC<MainContentProps> = ({
           </div>
           
           {/* Single scrollable container with two rows of posts */}
-          <div className="overflow-x-auto pb-2 snap-x scrollbar-hide scroll-smooth -mx-4 px-4">
+          <div className="overflow-x-auto pb-2 snap-x scrollbar-hide scroll-smooth px-4">
             <div className="w-max flex flex-col gap-3">
               {/* First row */}
               <div className="flex gap-3">
