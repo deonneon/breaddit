@@ -7,7 +7,7 @@ interface ScrollToTopProps {
 
 const ScrollToTop: FC<ScrollToTopProps> = ({ show, onClick }) => {
   return (
-    <div className="fixed bottom-8 left-[65%] translate-x-[-50%] z-10 md:bottom-8 md:right-8">
+    <div className="fixed bottom-8 left-[65%] translate-x-[-50%] z-10">
       <button
         onClick={onClick}
         className={`

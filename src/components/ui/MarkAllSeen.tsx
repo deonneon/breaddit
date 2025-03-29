@@ -22,7 +22,7 @@ const MarkAllSeen: FC<MarkAllSeenProps> = ({ onClick, hasNewComments = false }) 
   const isDisabled = !hasNewComments && !isChecked;
 
   return (
-    <div className="md:hidden fixed bottom-8 left-[50%] translate-x-[-50%] z-10 md:bottom-20 md:right-8">
+    <div className="md:hidden fixed bottom-8 left-[50%] translate-x-[-50%] z-10">
       <button
         onClick={handleClick}
         className={`opacity-90 ${
@@ -50,7 +50,7 @@ const MarkAllSeen: FC<MarkAllSeenProps> = ({ onClick, hasNewComments = false }) 
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span className="ml-1 text-xs hidden md:inline">
+        <span className="ml-1 text-xs hidden">
           {isChecked ? "Marked as seen ✓" : "Mark all seen"}
         </span>
       </button>

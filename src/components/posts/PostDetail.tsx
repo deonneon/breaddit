@@ -61,7 +61,7 @@ const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
 
     // First process the comments
     const updatedComments = processCommentsWithNewFlags(commentsToMark, true);
-
+ 
     // Update both states together
     setProcessedComments(updatedComments);
     setLocalMarkSeen(true);
@@ -93,6 +93,10 @@ const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
   // Get the count of new comments for the post, respecting local marked state
   const newCommentsCount = getNewCommentsCount();
 
+  useEffect(() => {
+    console.log("localMarkSeen", localMarkSeen)
+  }, [localMarkSeen])
+  
   // Reset ALL state when post changes
   useEffect(() => {
     // Reset state for a new post
