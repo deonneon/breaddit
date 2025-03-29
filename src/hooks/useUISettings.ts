@@ -10,7 +10,7 @@ export const useUISettings = () => {
   // Add state for font size with localStorage persistence
   const [fontSize, setFontSize] = useState<FontSize>(() => {
     const savedFontSize = localStorage.getItem("fontSize");
-    return (savedFontSize || "small") as FontSize; // Default to medium if not set
+    return (savedFontSize || "small") as FontSize; // Default to small if not set
   });
 
   // State for mobile sidebar visibility

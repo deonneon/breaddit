@@ -43,7 +43,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
   const commentClass = getCommentClass();
 
   return (
-    <div className="mb-2 md:mb-3 group">
+    <div className="mb-1 md:mb-1 group">
       <div
         className={`${getIndentClass()} ${commentClass} transition-all duration-200 ${
           comment.isNew ? "pl-3 md:pl-4" : "pl-2 md:pl-4"
@@ -67,7 +67,7 @@ const Comment = ({ comment, depth, timestamp }: CommentProps) => {
           )}
         </div>
         <div
-          className={`comment-body text-gray-900 dark:text-gray-200 mb-2 break-words overflow-hidden max-w-full prose dark:prose-invert prose-orange ${
+          className={`comment-body text-gray-900 dark:text-gray-200 break-words overflow-hidden max-w-full prose dark:prose-invert prose-orange ${
             depth === 0 ? "ml-4" : ""
           }`}
         >

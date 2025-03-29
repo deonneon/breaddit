@@ -55,6 +55,13 @@ const MainContent: FC<MainContentProps> = ({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(true);
   
+  // Add effect to reset selectedPostIndex when posts array changes
+  useEffect(() => {
+    if (posts.length === 0 || selectedPostIndex >= posts.length) {
+      setSelectedPostIndex(0);
+    }
+  }, [posts, selectedPostIndex, setSelectedPostIndex]);
+
   // Update newCommentsCount based on the current post detail ref
   useEffect(() => {
     const updateNewCommentsCount = () => {
@@ -403,10 +410,10 @@ const MainContent: FC<MainContentProps> = ({
         </div>
 
         <div className="space-y-8 pb-16 w-full max-w-full">
-          {selectedPostIndex < posts.length && (
+          {posts.length > 0 && selectedPostIndex < posts.length && (
             <PostDetail
               ref={mobilePostDetailRef}
-              key={`post-detail-${posts[selectedPostIndex].permalink}-${selectedPostIndex}`}
+              key={`post-detail-${posts[selectedPostIndex]?.permalink || 'no-post'}-${Date.now()}`}
               post={posts[selectedPostIndex]}
               seenComments={seenComments}
               markAllCommentsAsSeen={markAllCommentsAsSeen}
@@ -434,10 +441,10 @@ const MainContent: FC<MainContentProps> = ({
 
       {/* For 2xl screens: Right scrollable post detail content */}
       <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
-        {selectedPostIndex < posts.length && (
+        {posts.length > 0 && selectedPostIndex < posts.length && (
           <PostDetail
             ref={desktopPostDetailRef}
-            key={`post-detail-${posts[selectedPostIndex].permalink}-${selectedPostIndex}`}
+            key={`post-detail-${posts[selectedPostIndex]?.permalink || 'no-post'}-${Date.now()}`}
             post={posts[selectedPostIndex]}
             seenComments={seenComments}
             markAllCommentsAsSeen={markAllCommentsAsSeen}
