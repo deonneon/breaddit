@@ -48,6 +48,10 @@ const MainContent: FC<MainContentProps> = ({
   const mobilePostDetailRef = useRef<PostDetailHandle>(null);
   const desktopPostDetailRef = useRef<PostDetailHandle>(null);
   
+  // Add refs for the post detail container elements
+  const mobilePostDetailContainerRef = useRef<HTMLDivElement>(null);
+  const desktopPostDetailContainerRef = useRef<HTMLDivElement>(null);
+  
   // Add state to track new comments count
   const [newCommentsCount, setNewCommentsCount] = useState(0);
   
@@ -126,6 +130,27 @@ const MainContent: FC<MainContentProps> = ({
       top: 0,
       behavior: "smooth",
     });
+  };
+
+  // Function to instantly scroll post detail to top without animation
+  const scrollPostDetailToTop = () => {
+    // Determine which container to scroll based on screen size
+    if (window.innerWidth >= 1536) {
+      // For 2xl screens, scroll the desktop container
+      if (desktopPostDetailContainerRef.current) {
+        desktopPostDetailContainerRef.current.scrollTop = 0;
+      }
+    } else {
+      // For all other screens, first do window scroll
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTo(0, 0);
+      document.body.scrollTo(0, 0);
+      
+      // Then scroll the mobile container if it exists
+      if (mobilePostDetailContainerRef.current) {
+        mobilePostDetailContainerRef.current.scrollTop = 0;
+      }
+    }
   };
 
   // Function to handle mark all seen via PostDetail ref
@@ -269,6 +294,7 @@ const MainContent: FC<MainContentProps> = ({
                 onClick={() => {
                   setSelectedPostIndex(index);
                   markPostAsRead(post.permalink);
+                  scrollPostDetailToTop();
                 }}
                 className={`w-full text-left block ${
                   selectedPostIndex === index
@@ -368,6 +394,7 @@ const MainContent: FC<MainContentProps> = ({
                       onClick={() => {
                         setSelectedPostIndex(index);
                         markPostAsRead(post.permalink);
+                        scrollPostDetailToTop();
                       }}
                     />
                   </div>
@@ -385,6 +412,7 @@ const MainContent: FC<MainContentProps> = ({
                       onClick={() => {
                         setSelectedPostIndex(Math.ceil(posts.length / 2) + index);
                         markPostAsRead(post.permalink);
+                        scrollPostDetailToTop();
                       }}
                     />
                   </div>
@@ -404,16 +432,17 @@ const MainContent: FC<MainContentProps> = ({
               onClick={() => {
                 setSelectedPostIndex(index);
                 markPostAsRead(post.permalink);
+                scrollPostDetailToTop();
               }}
             />
           ))}
         </div>
 
-        <div className="space-y-8 pb-16 w-full max-w-full">
+        <div className="space-y-8 pb-16 w-full max-w-full" ref={mobilePostDetailContainerRef}>
           {posts.length > 0 && selectedPostIndex < posts.length && (
             <PostDetail
               ref={mobilePostDetailRef}
-              key={`post-detail-${posts[selectedPostIndex]?.permalink || 'no-post'}-${Date.now()}`}
+              key={`post-detail-${posts[selectedPostIndex]?.permalink || 'no-post'}`}
               post={posts[selectedPostIndex]}
               seenComments={seenComments}
               markAllCommentsAsSeen={markAllCommentsAsSeen}
@@ -440,11 +469,11 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For 2xl screens: Right scrollable post detail content */}
-      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4">
+      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4" ref={desktopPostDetailContainerRef}>
         {posts.length > 0 && selectedPostIndex < posts.length && (
           <PostDetail
             ref={desktopPostDetailRef}
-            key={`post-detail-${posts[selectedPostIndex]?.permalink || 'no-post'}-${Date.now()}`}
+            key={`post-detail-${posts[selectedPostIndex]?.permalink || 'no-post'}`}
             post={posts[selectedPostIndex]}
             seenComments={seenComments}
             markAllCommentsAsSeen={markAllCommentsAsSeen}
