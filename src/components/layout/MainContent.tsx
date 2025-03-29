@@ -27,6 +27,7 @@ interface MainContentProps {
   markAllCommentsAsSeen: (permalink: string, comments: RedditComment[]) => void;
   showScrollTop: boolean;
   setShowScrollTop: (show: boolean) => void;
+  refreshSeenCommentsFromStorage: () => void;
 }
 
 const MainContent: FC<MainContentProps> = ({
@@ -43,6 +44,7 @@ const MainContent: FC<MainContentProps> = ({
   markAllCommentsAsSeen,
   showScrollTop,
   setShowScrollTop,
+  refreshSeenCommentsFromStorage,
 }) => {
   // Create refs for both mobile and desktop post detail components
   const mobilePostDetailRef = useRef<PostDetailHandle>(null);
@@ -92,6 +94,18 @@ const MainContent: FC<MainContentProps> = ({
     
     return () => clearInterval(interval);
   }, [selectedPostIndex, posts]);
+
+  // When selectedPostIndex changes, we want to ensure the seenComments are refreshed
+  // from localStorage to capture any changes that might have happened
+  useEffect(() => {
+    // This assumes markAllCommentsAsSeen has refreshSeenCommentsFromStorage from the parent
+    if (typeof refreshSeenCommentsFromStorage === 'function') {
+      refreshSeenCommentsFromStorage();
+    }
+    
+    // After switching posts, scroll to top
+    scrollPostDetailToTop();
+  }, [selectedPostIndex]);
 
   const handleScroll = () => {
     // Only set up on mobile and not on 2xl screens

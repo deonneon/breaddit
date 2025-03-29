@@ -16,6 +16,14 @@ export const useComments = () => {
     return savedSeenComments ? JSON.parse(savedSeenComments) : {};
   });
 
+  // Add a function to refresh seenComments from localStorage
+  const refreshSeenCommentsFromStorage = useCallback(() => {
+    const savedSeenComments = localStorage.getItem('seenComments');
+    if (savedSeenComments) {
+      setSeenComments(JSON.parse(savedSeenComments));
+    }
+  }, []);
+
   // Helper function to recursively mark new comments by comparing with seen comments
   const markNewComments = useCallback(
     (comments: RedditComment[], postPermalink: string): RedditComment[] => {
@@ -148,6 +156,7 @@ export const useComments = () => {
     checkForNewComments,
     updateSeenComments,
     markAllCommentsAsSeen,
-    countNewComments
+    countNewComments,
+    refreshSeenCommentsFromStorage
   };
 }; 

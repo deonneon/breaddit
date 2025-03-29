@@ -110,6 +110,68 @@ const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
     }
   }, [post.permalink, processCommentsWithNewFlags, post.comments]);
 
+  // Effect that runs when component is mounted or post changes
+  // This ensures we have the latest seen state from seenComments
+  useEffect(() => {
+    // We need to check if this post's comments have been seen before
+    // using the latest seenComments props
+    const isCurrentlySeen = seenComments[post.permalink];
+    
+    // Update localMarkSeen state based on whether comments are already seen
+    if (isCurrentlySeen) {
+      // If we've seen this post before, check if we should mark all comments as seen
+      const allCommentsSeen = post.comments?.every(comment => {
+        // Check if this comment ID is in the seen list
+        return seenComments[post.permalink]?.commentIds?.includes(comment.id);
+      });
+      
+      // Update the local state
+      if (allCommentsSeen) {
+        setLocalMarkSeen(true);
+        
+        // Process comments to remove isNew flags visually
+        if (post.comments?.length > 0) {
+          const processedWithNoNewFlags = processCommentsWithNewFlags(
+            post.comments,
+            true // Mark all comments as seen
+          );
+          setProcessedComments(processedWithNoNewFlags);
+        }
+      } else {
+        // There are some new comments - need to process them correctly
+        if (post.comments?.length > 0) {
+          // Process comments using the latest seenComments data
+          const updatedComments = post.comments.map(comment => {
+            const isCommentNew = !seenComments[post.permalink]?.commentIds?.includes(comment.id);
+            
+            // Process replies recursively
+            const processReplies = (replies: RedditComment[] | undefined): RedditComment[] => {
+              if (!replies || !replies.length) return [];
+              
+              return replies.map(reply => {
+                const isReplyNew = !seenComments[post.permalink]?.commentIds?.includes(reply.id);
+                
+                return {
+                  ...reply,
+                  isNew: isReplyNew,
+                  replies: processReplies(reply.replies)
+                };
+              });
+            };
+            
+            return {
+              ...comment,
+              isNew: isCommentNew,
+              replies: processReplies(comment.replies)
+            };
+          });
+          
+          setProcessedComments(updatedComments);
+        }
+      }
+    }
+  }, [post.permalink, post.comments, seenComments, processCommentsWithNewFlags]);
+
   useEffect(() => {
     if (isFirstTimeSeenPost && post.comments?.length > 0) {
       handleMarkAllSeen();

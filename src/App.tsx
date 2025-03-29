@@ -42,7 +42,7 @@ const App = () => {
   } = useUISettings();
 
   // Get comments functionality from hook
-  const { seenComments, markAllCommentsAsSeen } = useComments();
+  const { seenComments, markAllCommentsAsSeen, refreshSeenCommentsFromStorage } = useComments();
 
   // Get subreddit posts functionality from hook with initial subreddit from URL
   const {
@@ -154,6 +154,7 @@ const App = () => {
           markAllCommentsAsSeen={markAllCommentsAsSeen}
           showScrollTop={showScrollTop}
           setShowScrollTop={setShowScrollTop}
+          refreshSeenCommentsFromStorage={refreshSeenCommentsFromStorage}
         />
       </main>
     </div>
