@@ -22,7 +22,7 @@ const MarkAllSeen: FC<MarkAllSeenProps> = ({ onClick, hasNewComments = false }) 
   const isDisabled = !hasNewComments && !isChecked;
 
   return (
-    <div className="fixed bottom-8 left-[50%] translate-x-[-50%] z-10 md:bottom-20 md:right-8">
+    <div className="md:hidden fixed bottom-8 left-[50%] translate-x-[-50%] z-10 md:bottom-20 md:right-8">
       <button
         onClick={handleClick}
         className={`opacity-90 ${
