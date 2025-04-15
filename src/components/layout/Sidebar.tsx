@@ -124,7 +124,7 @@ const Sidebar = ({
   };
 
   return (
-    <aside className="w-full h-full px-6 sm:px-0 bg-white dark:bg-gray-800 text-gray-800 dark:text-white overflow-y-auto flex flex-col border-r border-gray-200 dark:border-gray-700">
+    <aside className="w-full h-full px-6 sm:px-0 bg-white dark:bg-gray-800 text-gray-800 dark:text-white overflow-hidden flex flex-col border-r border-gray-200 dark:border-gray-700">
       <div className="hidden sm:block p-4 border-b border-gray-200 dark:border-gray-700 items-center justify-between">
         <h1 className="text-xl font-bold flex items-center">
           <span className="text-orange-500 mr-1">B</span>readdit
@@ -281,7 +281,7 @@ const Sidebar = ({
         )}
       </div>
 
-      <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700 mt-auto sticky bottom-0 bg-white dark:bg-gray-800 z-10">
         <div className="flex items-center justify-between">
 
           <ThemeToggle />
