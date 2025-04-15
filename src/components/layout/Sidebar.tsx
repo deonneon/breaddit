@@ -281,7 +281,7 @@ const Sidebar = ({
         )}
       </div>
 
-      <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700 mt-auto sticky bottom-0 bg-white dark:bg-gray-800 z-10">
+      <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700 absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 z-10">
         <div className="flex items-center justify-between">
 
           <ThemeToggle />
