@@ -108,10 +108,10 @@ const MainContent: FC<MainContentProps> = ({
   }, [selectedPostIndex]);
 
   const handleScroll = () => {
-    // Only set up on mobile and not on 2xl screens
-    const isMobile = window.innerWidth < 768;
-    const is2XL = window.innerWidth >= 1536;
-    if (is2XL || !isMobile) return;
+    // Only set up on mobile and not on xl screens
+    const isMobile = window.innerWidth < 1024;
+    const isxl = window.innerWidth >= 1536;
+    if (isxl || !isMobile) return;
 
     const scrollPosition = window.scrollY;
     setShowScrollTop(scrollPosition > 1200);
@@ -150,7 +150,7 @@ const MainContent: FC<MainContentProps> = ({
   const scrollPostDetailToTop = () => {
     // Determine which container to scroll based on screen size
     if (window.innerWidth >= 1536) {
-      // For 2xl screens, scroll the desktop container
+      // For xl screens, scroll the desktop container
       if (desktopPostDetailContainerRef.current) {
         desktopPostDetailContainerRef.current.scrollTop = 0;
       }
@@ -245,9 +245,9 @@ const MainContent: FC<MainContentProps> = ({
     );
   }
 
-  // For 2xl screens, we'll display a different layout with a traditional sidebar
+  // For xl screens, we'll display a different layout with a traditional sidebar
   return (
-    <div className="w-full h-full flex flex-col 2xl:flex-row bg-gray-50 dark:bg-gray-900 overflow-hidden">
+    <div className="w-full h-full flex flex-col xl:flex-row bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Mobile sidebar component */}
       <MobileSidebar
         isOpen={isMobileSidebarOpen}
@@ -262,8 +262,8 @@ const MainContent: FC<MainContentProps> = ({
         scrollPostDetailToTop={scrollPostDetailToTop}
       />
 
-      {/* For 2xl screens: Fixed left sidebar with subreddit title and post listing */}
-      <div className="hidden 2xl:flex 2xl:flex-col 2xl:w-80 2xl:h-[calc(100*var(--vh,1vh))] 2xl:flex-shrink-0 2xl:border-r 2xl:border-gray-200 2xl:dark:border-gray-700">
+      {/* For xl screens: Fixed left sidebar with subreddit title and post listing */}
+      <div className="hidden xl:flex xl:flex-col xl:w-68 xl:h-[calc(100*var(--vh,1vh))] xl:flex-shrink-0 xl:border-r xl:border-gray-200 xl:dark:border-gray-700">
         {/* Subreddit title and refresh button */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -332,7 +332,7 @@ const MainContent: FC<MainContentProps> = ({
                   )} */}
                   <div className="flex-1">
                     <h3
-                      className={`text-sm font-medium mb-1 line-clamp-2 ${
+                      className={`text-xs font-medium mb-1 line-clamp-2 ${
                         selectedPostIndex === index
                           ? "text-orange-600 dark:text-orange-400"
                           : "text-gray-800 dark:text-gray-200"
@@ -354,10 +354,10 @@ const MainContent: FC<MainContentProps> = ({
       </div>
 
       {/* For mobile and other screens: Regular post grid view */}
-      <div className="w-full 2xl:hidden p-4 md:p-8 overflow-hidden">
-        {/* Subreddit title, sort options, and refresh button - visible only on desktop (not 2xl) */}
-        <div className="hidden md:flex 2xl:hidden items-center mb-6 gap-2">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+      <div className="w-full xl:hidden p-4 md:p-8 overflow-hidden">
+        {/* Subreddit title, sort options, and refresh button - visible only on desktop (not xl) */}
+        <div className="hidden md:flex xl:hidden items-center mb-6 gap-2">
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
             <span className="text-orange-500 mr-2">r/</span>
             {subreddit}
           </h1>
@@ -486,8 +486,8 @@ const MainContent: FC<MainContentProps> = ({
         <ScrollToTop show={showScrollTop} onClick={scrollToTop} />
       </div>
 
-      {/* For 2xl screens: Right scrollable post detail content */}
-      <div className="hidden 2xl:block 2xl:flex-1 2xl:h-[calc(100*var(--vh,1vh))] 2xl:overflow-y-auto 2xl:overflow-x-hidden 2xl:p-4" ref={desktopPostDetailContainerRef}>
+      {/* For xl screens: Right scrollable post detail content */}
+      <div className="hidden xl:block xl:flex-1 xl:h-[calc(100*var(--vh,1vh))] xl:overflow-y-auto xl:overflow-x-hidden xl:p-4" ref={desktopPostDetailContainerRef}>
         {posts.length > 0 && selectedPostIndex < posts.length && (
           <PostDetail
             ref={desktopPostDetailRef}
@@ -498,9 +498,9 @@ const MainContent: FC<MainContentProps> = ({
           />
         )}
         
-        {/* Mark all seen button for 2xl screens */}
+        {/* Mark all seen button for xl screens */}
         {selectedPostIndex < posts.length && (
-          <div className="2xl:block hidden">
+          <div className="xl:block hidden">
             <MarkAllSeen 
               onClick={handleMarkCurrentPostCommentsSeen} 
               hasNewComments={newCommentsCount > 0}

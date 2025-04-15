@@ -139,7 +139,7 @@ const Sidebar = ({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             className="w-full px-4 py-2 text-xl md:text-sm pr-10 border rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:ring-orange-400 dark:focus:border-orange-400 transition-colors text-base"
-            placeholder="Enter subreddit name"
+            placeholder="Enter subreddit"
             aria-label="Subreddit name"
           />
           <button
@@ -264,7 +264,7 @@ const Sidebar = ({
                   className={`w-full px-4 py-2 rounded-lg text-left transition-all duration-200 ${
                     selectedSubreddit === subreddit
                       ? "bg-orange-500 text-white shadow-sm"
-                      : "bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-500 dark:text-white dark:hover:bg-gray-700"
+                      : "bg-white text-gray-600 hover:bg-gray-100 dark:bg-transparent dark:text-gray-300 dark:hover:bg-gray-700"
                   }`}
                   aria-label={`Select ${subreddit} subreddit`}
                   aria-pressed={selectedSubreddit === subreddit}
@@ -283,9 +283,7 @@ const Sidebar = ({
 
       <div className="p-6 sm:p-2 px-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <div className="text-md md:text-xs text-gray-500 dark:text-gray-400">
-            <p>Reddit Reader</p>
-          </div>
+
           <ThemeToggle />
           <button
             onClick={openSettings}
