@@ -131,7 +131,7 @@ const Sidebar = ({
         </h1>
       </div>
 
-      <div className="p-3 mt-20 md:my-4">
+      <div className="p-3 mt-20 md:mt-3">
         <div className="relative mb-6">
           <input
             type="text"
@@ -271,7 +271,7 @@ const Sidebar = ({
                 >
                   <div className="flex items-center">
                     <span className="text-3xl md:text-sm font-medium">
-                      r/{subreddit}
+                      r/{subreddit.toLowerCase()}
                     </span>
                   </div>
                 </button>

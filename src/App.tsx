@@ -109,7 +109,7 @@ const App = () => {
       />
 
       {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden md:block md:fixed md:left-0 md:top-0 md:h-[calc(100*var(--vh,1vh))] w-48 md:z-20">
+      <div className="hidden md:block md:fixed md:left-0 md:top-0 md:h-[calc(100*var(--vh,1vh))] w-52 md:z-20">
         <Sidebar
           subreddits={DEFAULT_SUBREDDITS}
           selectedSubreddit={subreddit}
@@ -135,7 +135,7 @@ const App = () => {
       <main
         className={`
           flex-1 max-w-full overflow-hidden 
-          min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))] md:ml-48
+          min-h-[calc(100*var(--vh,1vh))] md:min-h-[calc(100*var(--vh,1vh))] md:ml-52
           ${sidebarOpen ? "pt-0" : "pt-16"} md:pt-0
           transition-spacing duration-300
         `}
