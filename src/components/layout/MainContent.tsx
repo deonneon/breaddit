@@ -77,12 +77,14 @@ const MainContent: FC<MainContentProps> = ({
         return;
       }
       
-      let count = 0;
-      if (window.innerWidth >= 1536) {
-        count = desktopPostDetailRef.current?.getNewCommentsCount() || 0;
-      } else {
-        count = mobilePostDetailRef.current?.getNewCommentsCount() || 0;
-      }
+      // Get the appropriate ref based on current viewport
+      // Use a cleaner approach for responsiveness
+      const activeRef = window.innerWidth >= 1536 
+        ? desktopPostDetailRef.current
+        : mobilePostDetailRef.current;
+      
+      // Get new comments count from the active ref  
+      const count = activeRef?.getNewCommentsCount() || 0;
       setNewCommentsCount(count);
     };
     
@@ -90,9 +92,19 @@ const MainContent: FC<MainContentProps> = ({
     updateNewCommentsCount();
     
     // Set up interval to check for new comments count
-    const interval = setInterval(updateNewCommentsCount, 1000);
+    const interval = setInterval(updateNewCommentsCount, 500);
     
-    return () => clearInterval(interval);
+    // Also update on window resize
+    const handleResize = () => {
+      updateNewCommentsCount();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [selectedPostIndex, posts]);
 
   // When selectedPostIndex changes, we want to ensure the seenComments are refreshed

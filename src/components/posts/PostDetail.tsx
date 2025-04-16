@@ -68,6 +68,10 @@ const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
 
     // Finally update localStorage
     markAllCommentsAsSeen(post.permalink, updatedComments);
+    
+    // Force an update of the new comments count in parent component
+    // by triggering a re-render
+    setProcessedComments([...updatedComments]);
   }, [
     post.permalink,
     post.comments,
@@ -78,8 +82,27 @@ const PostDetail = forwardRef<PostDetailHandle, PostDetailProps>(({
 
   // Function to get the current new comments count
   const getNewCommentsCount = useCallback(() => {
-    return localMarkSeen ? 0 : post._newCommentsCount || 0;
-  }, [localMarkSeen, post._newCommentsCount]);
+    if (localMarkSeen) return 0;
+    
+    // Count new comments recursively through the comment tree
+    const countNewComments = (comments: RedditComment[]): number => {
+      if (!comments || !comments.length) return 0;
+      
+      return comments.reduce((count, comment) => {
+        // Count this comment if it's new
+        let newCount = comment.isNew ? 1 : 0;
+        
+        // Count new comments in replies
+        if (comment.replies && comment.replies.length > 0) {
+          newCount += countNewComments(comment.replies);
+        }
+        
+        return count + newCount;
+      }, 0);
+    };
+    
+    return countNewComments(processedComments);
+  }, [localMarkSeen, processedComments]);
 
   // Expose the markAllCommentsSeen method to parent components
   useImperativeHandle(ref, () => ({
