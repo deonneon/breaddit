@@ -31,7 +31,7 @@ const MarkAllSeen: FC<MarkAllSeenProps> = ({ onClick, hasNewComments = false }) 
           isChecked 
             ? 'bg-gray-300/90 dark:bg-gray-700/90' 
             : hasNewComments 
-              ? 'bg-green-700/90 hover:bg-green-800/90 animate-pulse' 
+              ? 'bg-green-700/90 hover:bg-green-800/90' 
               : 'bg-gray-300/90 dark:bg-gray-700/90'
         } text-white dark:text-gray-300 rounded-lg p-2 shadow-xl backdrop-blur-md transition-all duration-200 border border-white/20 relative before:absolute before:inset-[-12px] before:content-[''] flex items-center`}
         aria-label="Mark all comments as seen in the current post"
