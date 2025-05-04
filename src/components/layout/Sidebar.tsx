@@ -197,7 +197,7 @@ const Sidebar = ({
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="mb-6">
-          <h2 className="text-3xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
+          <h2 className="text-2xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-7 w-7 md:h-4 md:w-4 mr-2"
@@ -228,7 +228,7 @@ const Sidebar = ({
                 aria-pressed={selectedSubreddit === subreddit}
               >
                 <div className="flex items-center">
-                  <span className="text-3xl md:text-sm font-medium">
+                  <span className="text-2xl md:text-sm font-medium">
                     r/{subreddit}
                   </span>
                 </div>
@@ -239,7 +239,7 @@ const Sidebar = ({
 
         {mySubreddits.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-3xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
+            <h2 className="text-2xl md:text-sm uppercase font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 mr-2"
@@ -270,7 +270,7 @@ const Sidebar = ({
                   aria-pressed={selectedSubreddit === subreddit}
                 >
                   <div className="flex items-center">
-                    <span className="text-3xl md:text-sm font-medium">
+                    <span className="text-2xl md:text-sm font-medium">
                       r/{subreddit.toLowerCase()}
                     </span>
                   </div>

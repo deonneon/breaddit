@@ -52,9 +52,6 @@ const MarkAllSeen: FC<MarkAllSeenProps> = ({ onClick, hasNewComments = false }) 
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span className={`ml-1 text-xs ${hasNewComments ? 'flex' : 'hidden'}`}>
-          {isChecked ? "Marked" : "Mark all seen"}
-        </span>
       </button>
     </div>
   );
