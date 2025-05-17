@@ -71,7 +71,7 @@ const Sidebar = ({
   const handleFetchClick = async () => {
     if (!inputSubreddit.trim()) return;
     
-    const newSubreddit = inputSubreddit.trim();
+    const newSubreddit = inputSubreddit.trim().toLowerCase();
     setIsLoading(true);
     setError(null);
     
@@ -86,17 +86,25 @@ const Sidebar = ({
         }
       }
       
-      // Only proceed with navigation and adding to mySubreddits if validation passes
-      onSubredditSelect(newSubreddit);
-
-      // Add to mySubreddits if not already in the list
+      // Check if the subreddit is already in one of our lists (case-insensitive)
+      const lowerCaseMySubreddits = mySubreddits.map(s => s.toLowerCase());
+      const lowerCaseDefaultSubreddits = subreddits.map(s => s.toLowerCase());
+      
+      // Add to mySubreddits if not already in either list
       if (
-        !mySubreddits.includes(newSubreddit) &&
-        !subreddits.includes(newSubreddit)
+        !lowerCaseMySubreddits.includes(newSubreddit) &&
+        !lowerCaseDefaultSubreddits.includes(newSubreddit)
       ) {
-        setMySubreddits((prev) => [...prev, newSubreddit]);
+        // Update state
+        const updatedSubreddits = [...mySubreddits, newSubreddit];
+        setMySubreddits(updatedSubreddits);
+        
+        // Update localStorage immediately to prevent loss on unmount
+        localStorage.setItem("mySubreddits", JSON.stringify(updatedSubreddits));
       }
-
+      
+      // Proceed with navigation
+      onSubredditSelect(newSubreddit);
       setInputSubreddit("");
     } catch (err) {
       setError(`Error fetching subreddit: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -271,7 +279,7 @@ const Sidebar = ({
                 >
                   <div className="flex items-center">
                     <span className="text-2xl md:text-sm font-medium">
-                      r/{subreddit.toLowerCase()}
+                      r/{subreddit}
                     </span>
                   </div>
                 </button>
