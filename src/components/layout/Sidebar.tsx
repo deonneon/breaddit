@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import SettingsModal from "../modals/SettingsModal";
 import ThemeToggle from "../ui/ThemeToggle";
+import UserBadge from "../ui/UserBadge";
 import type { SortType } from "../../services/redditService";
 import type { FontSize } from "../../hooks/useUISettings";
 
@@ -134,9 +135,7 @@ const Sidebar = ({
   return (
     <aside className="w-full h-full px-6 sm:px-0 bg-white dark:bg-gray-800 text-gray-800 dark:text-white overflow-y-auto flex flex-col border-r border-gray-200 dark:border-gray-700">
       <div className="hidden sm:block p-4 border-b border-gray-200 dark:border-gray-700 items-center justify-between">
-        <h1 className="text-xl font-bold flex items-center">
-          <span className="text-orange-500 mr-1">B</span>readdit
-        </h1>
+          <UserBadge />
       </div>
 
       <div className="p-3 mt-20 md:mt-3">

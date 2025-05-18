@@ -7,6 +7,8 @@ import { useComments } from "./hooks/useComments";
 import { useUISettings, FontSize } from "./hooks/useUISettings";
 import { validateSubreddit } from "./services/redditService";
 import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
 // Default subreddits that are always available
 const DEFAULT_SUBREDDITS = [
