@@ -264,7 +264,7 @@ const Sidebar = ({
             </svg>
               Personal
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-2 mt-1 sm:mt-0">
               {mySubreddits.map((subreddit) => (
                 <button
                   key={subreddit}
